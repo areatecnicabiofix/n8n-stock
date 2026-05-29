@@ -1,501 +1,453 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestión de Stock — Implantes Dentales</title>
+  <title>Formulario de Gestión de Implantes — Catálogo Real</title>
+  
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
+    * { box-sizing: border-box; }
+    body { 
+      margin: 0; 
+      padding: 2rem; 
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #f0f4f8;
-      min-height: 100vh;
+      background: #f5f7fb;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      padding: 2rem 1rem;
     }
-    .card {
-      background: #ffffff;
-      border: 0.5px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 2rem;
-      width: 100%;
-      max-width: 560px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    
+    .preview-form { max-width: 550px; width: 100%; }
+    .card { 
+      background: #ffffff; 
+      border: 0.5px solid #e2e8f0; 
+      border-radius: 12px; 
+      padding: 1.5rem; 
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
     }
-    .header { margin-bottom: 1.75rem; }
-    .header-title { font-size: 20px; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
-    .header-sub { font-size: 13px; color: #64748b; }
-
     .q { margin-bottom: 1.25rem; }
     .q.hidden { display: none; }
     .hidden { display: none; }
-
-    .label { font-size: 13px; font-weight: 500; color: #374151; display: block; margin-bottom: 6px; }
-    .sub { font-size: 12px; color: #6b7280; display: block; margin-bottom: 7px; }
-    .hint { font-size: 11px; color: #9ca3af; margin-top: 5px; display: block; }
-
-    select, input[type=text], input[type=number] {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 0.5px solid #d1d5db;
-      background: #f9fafb;
-      font-size: 14px;
-      color: #111827;
-      font-family: inherit;
-      transition: border-color .15s, background .15s;
+    
+    .label { font-size: 14px; font-weight: 500; color: #1e293b; display: block; margin-bottom: 5px; }
+    .sub { font-size: 12px; color: #64748b; display: block; margin-bottom: 7px; }
+    .hint { font-size: 11px; color: #94a3b8; margin-top: 5px; display: block; }
+    
+    select, input[type=text], input[type=number] { 
+      width: 100%; 
+      padding: 10px 12px; 
+      border-radius: 6px; 
+      border: 0.5px solid #cbd5e1; 
+      background: #f8fafc; 
+      font-size: 14px; 
+      color: #1e293b; 
     }
-    select:focus, input:focus {
-      outline: none;
-      border-color: #2563eb;
-      background: #fff;
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+    select:focus, input:focus { outline: none; border-color: #0284c7; background: #fff; }
+    
+    .radio-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .ropt { 
+      display: flex; align-items: center; gap: 6px; padding: 10px 16px; 
+      border: 0.5px solid #cbd5e1; border-radius: 6px; cursor: pointer; 
+      font-size: 14px; background: #f8fafc; color: #1e293b; transition: all .15s; 
     }
-    select:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .radio-row { display: flex; gap: 8px; }
-    .ropt {
-      flex: 1;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-      padding: 10px 16px;
-      border: 0.5px solid #d1d5db;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      background: #f9fafb;
-      color: #374151;
-      transition: all .15s;
-      user-select: none;
-    }
-    .ropt.on {
-      background: #eff6ff;
-      color: #1d4ed8;
-      border-color: #93c5fd;
-      font-weight: 500;
-    }
-    .ropt.dep.on { background: #f0fdf4; color: #15803d; border-color: #86efac; }
-    .ropt.sal.on { background: #fff7ed; color: #c2410c; border-color: #fdba74; }
-
-    .btn {
-      padding: 11px 24px;
-      border-radius: 8px;
-      background: #2563eb;
-      color: #fff;
-      font-size: 14px;
-      font-weight: 500;
-      border: none;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background .15s, transform .1s;
-    }
-    .btn:hover { background: #1d4ed8; }
-    .btn:active { transform: scale(0.98); }
-    .btn:disabled { background: #93c3fd; cursor: not-allowed; }
-
-    .btn-sec {
-      padding: 10px 16px;
-      border-radius: 8px;
-      background: transparent;
-      color: #6b7280;
-      font-size: 13px;
-      border: 0.5px solid #d1d5db;
-      cursor: pointer;
-      font-family: inherit;
-    }
-    .btn-sec:hover { background: #f9fafb; }
-
-    .divider { height: 0.5px; background: #f1f5f9; margin: 1.25rem 0; }
-    .section-label {
-      font-size: 11px; font-weight: 600; color: #9ca3af;
-      text-transform: uppercase; letter-spacing: .07em;
-      margin: 1.25rem 0 .75rem; display: block;
-    }
-
-    .loading-row {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 13px; color: #6b7280; padding: 8px 0;
-    }
-    .spinner {
-      width: 16px; height: 16px;
-      border: 2px solid #e2e8f0;
-      border-top-color: #2563eb;
-      border-radius: 50%;
-      animation: spin .6s linear infinite;
-      flex-shrink: 0;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .alert {
-      border-radius: 8px; padding: 10px 14px;
-      font-size: 13px; margin-bottom: 1rem;
-      display: flex; align-items: flex-start; gap: 8px;
-    }
-    .alert-success { background: #f0fdf4; color: #166534; border: 0.5px solid #bbf7d0; }
-    .alert-error { background: #fef2f2; color: #991b1b; border: 0.5px solid #fecaca; }
-    .alert-info { background: #eff6ff; color: #1e40af; border: 0.5px solid #bfdbfe; }
-
-    .summary-box {
-      background: #f8fafc;
-      border: 0.5px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 12px 14px;
-      margin: 1rem 0;
-    }
-    .summary-row {
-      display: flex; justify-content: space-between;
-      font-size: 13px; padding: 3px 0;
-    }
-    .summary-row .sk { color: #6b7280; }
-    .summary-row .sv { color: #111827; font-weight: 500; }
-
-    .lote-nuevo-tag {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 2px 8px; border-radius: 99px;
-      background: #fefce8; color: #854d0e;
-      border: 0.5px solid #fde68a;
-      font-size: 11px; font-weight: 500;
-      margin-left: 6px;
-    }
+    .ropt.on { background: #e0f2fe; color: #0369a1; border-color: #0369a1; font-weight: 500; }
+    
+    .btn { padding: 10px 22px; border-radius: 6px; background: #0284c7; color: #ffffff; font-size: 14px; font-weight: 500; border: none; cursor: pointer; }
+    .btn:disabled { background: #94a3b8; cursor: not-allowed; }
+    .btn-sec { padding: 9px 16px; border-radius: 6px; background: transparent; color: #64748b; font-size: 13px; border: 0.5px solid #cbd5e1; cursor: pointer; }
+    .divider { height: 0.5px; background: #e2e8f0; margin: 1.25rem 0; }
+    .section-label { font-size: 11px; font-weight: 500; color: #94a3b8; text-transform: uppercase; letter-spacing: .06em; margin: 1.25rem 0 .75rem; display: block; }
+    
+    .success-box { background: #f0fdf4; border: 0.5px solid #bbf7d0; border-radius: 6px; padding: 10px 14px; font-size: 13px; color: #166534; margin-bottom: 1rem; }
   </style>
 </head>
 <body>
-<div class="card">
-  <div class="header">
-    <div class="header-title"><i class="ti ti-building-hospital" style="font-size:18px;vertical-align:-2px;margin-right:6px"></i>Registro de Movimiento</div>
-    <div class="header-sub">Sistema de trazabilidad de implantes dentales</div>
-  </div>
 
-  <!-- TIPO DE MOVIMIENTO -->
-  <div class="q" id="pq1">
-    <span class="label">Tipo de movimiento</span>
-    <div class="radio-row">
-      <div class="ropt dep on" id="rb-dep" onclick="selMov('dep')">
-        <i class="ti ti-arrow-bar-to-down"></i> Depósito
+  <div class="card preview-form">
+    <div style="margin-bottom:1.25rem">
+      <div style="font-size:18px;font-weight:600;color:#1e293b;margin-bottom:3px">Registro de Movimiento de Stock</div>
+      <div style="font-size:13px;color:#64748b">Sistema de Trazabilidad de Implantes Dentales</div>
+    </div>
+
+    <div class="q" id="pq1">
+      <span class="label">Tipo de movimiento</span>
+      <div class="radio-row">
+        <div class="ropt on" id="rb-dep" onclick="selMov('dep')"><i class="ti ti-arrow-bar-to-down"></i> Depósito</div>
+        <div class="ropt" id="rb-sal" onclick="selMov('sal')"><i class="ti ti-arrow-bar-up"></i> Salida</div>
       </div>
-      <div class="ropt sal" id="rb-sal" onclick="selMov('sal')">
-        <i class="ti ti-arrow-bar-up"></i> Salida
+      <span class="hint">Depósito = agregar stock · Salida = retirar para uso clínico</span>
+    </div>
+
+    <div class="q" id="pq2">
+      <span class="label">Tipo de implante</span>
+      <select id="tipo-sel" onchange="onTipo()">
+        <option value="">— Seleccioná el tipo —</option>
+        <option value="MP">Monopieza (MP)</option>
+        <option value="HI">Hexágono Interno (HI)</option>
+        <option value="HE">Hexágono Externo (HE)</option>
+        <option value="MBP">Monopieza Basal Pulido (MBP)</option>
+        <option value="MBT">Monopieza Basal Tratado (MBT)</option>
+        <option value="CM">Cono Morse (CM)</option>
+        <option value="CMU">Compresivo MultiUnit (CMU)</option>
+        <option value="CMU3">Compresivo MultiUnit C3 (CMU3)</option>
+      </select>
+    </div>
+
+    <div class="q hidden" id="pq3">
+      <span class="label">Medida (Diámetro x Longitud)</span>
+      <select id="med-sel" onchange="onMedida()">
+        <option value="">— Seleccioná la medida —</option>
+      </select>
+    </div>
+
+    <div class="q hidden" id="pq4">
+      <span class="label">Lote asignado</span>
+      <select id="lote-sel" onchange="onLote()">
+        <option value="">— Seleccioná el lote —</option>
+      </select>
+      <span class="hint" id="hint-lote"></span>
+    </div>
+
+    <div class="q hidden" id="pq4b">
+      <span class="label">Número de lote nuevo</span>
+      <span class="sub">Ingresá el identificador único del nuevo lote</span>
+      <input type="text" id="lote-nuevo-inp" placeholder="Ej: Lot-MP 0180">
+    </div>
+
+    <div class="q hidden" id="pq5">
+      <span class="label">Cantidad</span>
+      <input type="number" min="1" placeholder="Ej: 5" id="cant-inp">
+      <span class="hint" id="hint-cant"></span>
+    </div>
+
+    <div class="q hidden" id="pq-sal">
+      <div class="divider" style="margin:0 0 1.25rem"></div>
+      <span class="section-label">Datos Clínicos de Salida</span>
+
+      <div class="q">
+        <span class="label">Profesional o Clínica</span>
+        <input type="text" id="profesional-inp" placeholder='Ej: Dr. Diego Sorrentini'>
+      </div>
+      <div class="q">
+        <span class="label">N° remito / vía cargo</span>
+        <input type="text" id="remito-inp" placeholder="Ej: 9090-57385">
+      </div>
+      <div class="q" style="margin-bottom:0">
+        <span class="label">N° presupuesto</span>
+        <input type="text" value="N°5407" style="color:#94a3b8" readonly>
+        <span class="hint">Autocompletado automático vía n8n</span>
       </div>
     </div>
-  </div>
 
-  <!-- TIPO DE IMPLANTE -->
-  <div class="q" id="pq2">
-    <span class="label">Tipo de implante</span>
-    <select id="tipo-sel" onchange="onTipo()">
-      <option value="">— Seleccioná el tipo —</option>
-      <option value="MP">Monopieza (MP)</option>
-      <option value="HI">Hexágono Interno (HI)</option>
-      <option value="HE">Hexágono Externo (HE)</option>
-      <option value="MBP">Monopieza Basal Pulido (MBP)</option>
-      <option value="MBT">Monopieza Basal Tratado (MBT)</option>
-      <option value="CM">Cono Morse (CM)</option>
-      <option value="CMU">Compresivo MultiUnit (CMU)</option>
-      <option value="CMU3">Compresivo MultiUnit C3 (CMU3)</option>
-    </select>
-  </div>
+    <div id="preview-summary" class="hidden" style="margin:1rem 0">
+      <div class="divider" style="margin:.75rem 0"></div>
+      <div style="font-size:12px;color:#64748b;margin-bottom:6px">Resumen de transacción:</div>
+      <div id="summary-content" style="font-size:13px;color:#1e293b;line-height:1.8"></div>
+    </div>
 
-  <!-- MEDIDA -->
-  <div class="q hidden" id="pq3">
-    <span class="label">Medida</span>
-    <select id="med-sel" onchange="onMedida()">
-      <option value="">— Seleccioná la medida —</option>
-    </select>
-  </div>
+    <div style="display:flex;gap:8px;margin-top:1rem;align-items:center">
+      <button class="btn" onclick="submitPreview()">Registrar movimiento</button>
+      <button class="btn-sec" onclick="resetForm()">Limpiar formulario</button>
+    </div>
 
-  <!-- LOADING LOTES -->
-  <div class="hidden" id="lotes-loading">
-    <div class="loading-row">
-      <div class="spinner"></div>
-      <span>Consultando lotes disponibles en la hoja de cálculo...</span>
+    <div id="confirm-msg" class="hidden" style="margin-top:1rem">
+      <div class="success-box"><i class="ti ti-check"></i> Movimiento enviado a n8n y registrado correctamente en la base de datos.</div>
     </div>
   </div>
 
-  <!-- LOTE -->
-  <div class="q hidden" id="pq4">
-    <span class="label">Lote</span>
-    <select id="lote-sel" onchange="onLote()">
-      <option value="">— Seleccioná el lote —</option>
-    </select>
-    <span class="hint" id="hint-lote"></span>
-  </div>
+  <script>
+    // BASE DE DATOS ESTRUCTURADA BASADA EXACTAMENTE EN TU DOCUMENTO
+    const DATA = {
+      MP: {
+        medidas: [
+          'Ø3.0 X 6mm', 'Ø3.0 X 8mm', 'Ø3.0 X 10mm', 'Ø3.0 X 11,5mm', 'Ø3.0 X 13mm', 'Ø3.0 X 15mm', 'Ø3.0 X 18mm', 'Ø3.0 X 20mm',
+          'Ø3.5 X 6mm', 'Ø3.5 X 8mm', 'Ø3.5 X 10mm', 'Ø3.5 X 11,5mm', 'Ø3.5 X 13mm', 'Ø3.5 X 15mm', 'Ø3.5 X 18mm', 'Ø3.5 X 20mm',
+          'Ø4.0 X 6mm', 'Ø4.0 X 8mm', 'Ø4.0 X 10mm', 'Ø4.0 X 11,5mm', 'Ø4.0 X 13mm', 'Ø4.0 X 15mm', 'Ø4.0 X 18mm', 'Ø4.0 X 20mm',
+          'Ø4.5 X 6mm', 'Ø4.5 X 8mm', 'Ø4.5 X 10mm', 'Ø4.5 X 11,5mm', 'Ø4.5 X 13mm', 'Ø4.5 X 15mm', 'Ø4.5 X 18mm', 'Ø4.5 X 20mm',
+          'Ø5.0 X 6mm', 'Ø5.0 X 8mm', 'Ø5.0 X 10mm', 'Ø5.0 X 11,5mm', 'Ø5.0 X 13mm',
+          'Ø5.5 X 6mm', 'Ø5.5 X 8mm', 'Ø5.5 X 10mm', 'Ø5.5 X 11,5mm', 'Ø5.5 X 13mm'
+        ],
+        lotes: {
+          'Ø3.0 X 6mm': ['Lot-MP 0170'], 'Ø3.0 X 8mm': ['Lot-MP 0169', 'Lot-MP 0170'], 'Ø3.0 X 10mm': ['Lot-MP 0170'], 'Ø3.0 X 11,5mm': ['Lot-MP 0170'], 'Ø3.0 X 13mm': ['Lot-MP 0170'], 'Ø3.0 X 15mm': ['Lot-MP 0170'], 'Ø3.0 X 18mm': ['Lot-MP 0169', 'Lot-MP 0170'], 'Ø3.0 X 20mm': ['Lot-MP 0139', 'Lot-MP 0169', 'Lot-MP 0170'],
+          'Ø3.5 X 6mm': ['Lot-MP 0169', 'Lot-MP 0170'], 'Ø3.5 X 8mm': ['Lot-MP 0170'], 'Ø3.5 X 10mm': ['Lot-MP 0170'], 'Ø3.5 X 11,5mm': ['Lot-MP 0170'], 'Ø3.5 X 13mm': ['Lot-MP 0170'], 'Ø3.5 X 15mm': [], 'Ø3.5 X 18mm': ['Lot-MP 0170'], 'Ø3.5 X 20mm': ['Lot-MP 0169', 'Lot-MP 0170'],
+          'Ø4.0 X 6mm': ['Lot-MP 0170'], 'Ø4.0 X 8mm': ['Lot-MP 0170'], 'Ø4.0 X 10mm': ['Lot-MP 0170'], 'Ø4.0 X 11,5mm': ['Lot-MP 0170'], 'Ø4.0 X 13mm': [], 'Ø4.0 X 15mm': ['Lot-MP 0170'], 'Ø4.0 X 18mm': ['Lot-MP 0161', 'Lot-MP 0169', 'Lot-MP 0170'], 'Ø4.0 X 20mm': ['Lot-MP 0148', 'Lot-MP 0169', 'Lot-MP 0170'],
+          'Ø4.5 X 6mm': ['Lot-MP 0148', 'Lot-MP 0155'], 'Ø4.5 X 8mm': ['Lot-MP 0155', 'Lot-MP 0168'], 'Ø4.5 X 10mm': ['Lot-MP 0155', 'Lot-MP 0169'], 'Ø4.5 X 11,5mm': ['Lot-MP 0169'], 'Ø4.5 X 13mm': ['Lot-MP 0169'], 'Ø4.5 X 15mm': [], 'Ø4.5 X 18mm': ['Lot-MP 0155', 'Lot-MP 0169'], 'Ø4.5 X 20mm': ['Lot-MP 0155', 'Lot-MP 0168', 'Lot-MP 0169'],
+          'Ø5.0 X 6mm': ['Lot-MP 0155'], 'Ø5.0 X 8mm': ['Lot-MP 0155'], 'Ø5.0 X 10mm': ['Lot-MP 0148'], 'Ø5.0 X 11,5mm': ['Lot-MP 0127', 'Lot-MP 0148', 'Lot-MP 0155'], 'Ø5.0 X 13mm': ['Lot-MP 0148'],
+          'Ø5.5 X 6mm': ['Lot-MP 0110', 'Lot-MP 0155'], 'Ø5.5 X 8mm': ['Lot-MP 0148'], 'Ø5.5 X 10mm': ['Lot-MP 0148'], 'Ø5.5 X 11,5mm': ['Lot-MP 0137', 'Lot-MP 0148'], 'Ø5.5 X 13mm': ['Lot-MP 0169']
+        }
+      },
+      HI: {
+        medidas: [
+          'Ø3.30 X 6,5mm', 'Ø3.30 X 8mm', 'Ø3.30 X 10mm', 'Ø3.30 X 11,5mm', 'Ø3.30 X 13mm', 'Ø3.30 X 16mm',
+          'Ø3,75 X 6,5mm', 'Ø3.75 X 8mm', 'Ø3.75 X 10mm', 'Ø3.75 X 11,5mm', 'Ø3.75 X 13mm', 'Ø3.75 X 16mm',
+          'Ø4,2 X 6,5mm', 'Ø4.2 X 8mm', 'Ø4.2 X 10mm', 'Ø4.2 X 11,5mm', 'Ø4.2 X 13mm', 'Ø4.2 X 16mm',
+          'Ø5,0 X 6,5mm', 'Ø5.0 X 8mm', 'Ø5.0 X 10mm', 'Ø5.0 X 11,5mm', 'Ø5.0 X 13mm', 'Ø5.0 X 16mm'
+        ],
+        lotes: {
+          'Ø3.30 X 6,5mm': ['Lot-HI 096', 'Lot-HI 0136'], 'Ø3.30 X 8mm': ['Lot-HI 0151'], 'Ø3.30 X 10mm': [], 'Ø3.30 X 11,5mm': [], 'Ø3.30 X 13mm': ['Lot-HI 0151'], 'Ø3.30 X 16mm': ['Lot-HI 0136'],
+          'Ø3,75 X 6,5mm': ['Lot-HI 096'], 'Ø3.75 X 8mm': [], 'Ø3.75 X 10mm': [], 'Ø3.75 X 11,5mm': [], 'Ø3.75 X 13mm': [], 'Ø3.75 X 16mm': [],
+          'Ø4,2 X 6,5mm': ['Lot-HI 0118'], 'Ø4.2 X 8mm': [], 'Ø4.2 X 10mm': [], 'Ø4.2 X 11,5mm': [], 'Ø4.2 X 13mm': [], 'Ø4.2 X 16mm': [],
+          'Ø5,0 X 6,5mm': ['Lot-HI 0131', 'Lot-HI 0163'], 'Ø5.0 X 8mm': ['Lot-HI 0163'], 'Ø5.0 X 10mm': [], 'Ø5.0 X 11,5mm': ['Lot-HI 0151'], 'Ø5.0 X 13mm': [], 'Ø5.0 X 16mm': ['Lot-HI 086']
+        }
+      },
+      HE: {
+        medidas: [
+          'Ø3.30 X 8,5mm', 'Ø3.30 X 10mm', 'Ø3.30 X 11,5mm', 'Ø3.30 X 13mm', 'Ø3.30 X 15mm',
+          'Ø3.75 X 8,5mm', 'Ø3.75 X 10mm', 'Ø3.75 X 11,5mm', 'Ø3.75 X 13mm', 'Ø3.75 X 15mm',
+          'Ø4.0 X 6mm', 'Ø4.0 X 8,5mm', 'Ø4.0 X 10mm', 'Ø4.0 X 11,5mm', 'Ø4.0 X 13mm', 'Ø4.0 X 15mm',
+          'Ø5.0 X 8,5mm', 'Ø5.0 X 10mm', 'Ø5.0 X 11,5mm', 'Ø5.0 X 13mm', 'Ø5.0 X 15mm'
+        ],
+        lotes: {
+          'Ø3.30 X 8,5mm': ['Lote HE-093', 'Lote HE-0100'], 'Ø3.30 X 10mm': [], 'Ø3.30 X 11,5mm': [], 'Ø3.30 X 13mm': ['Lote HE-085'], 'Ø3.30 X 15mm': [],
+          'Ø3.75 X 8,5mm': [], 'Ø3.75 X 10mm': [], 'Ø3.75 X 11,5mm': ['Lote HE - 0164'], 'Ø3.75 X 13mm': ['Lote HE-085'], 'Ø3.75 X 15mm': ['Lote HE-075'],
+          'Ø4.0 X 6mm': ['Lote HE-0109', 'Lote HE - 0164'], 'Ø4.0 X 8,5mm': [], 'Ø4.0 X 10mm': ['Lote HE - 0164'], 'Ø4.0 X 11,5mm': [], 'Ø4.0 X 13mm': ['Lote HE-0100', 'Lote HE-0109'], 'Ø4.0 X 15mm': [],
+          'Ø5.0 X 8,5mm': ['Lote HE-0100', 'Lote HE-0120'], 'Ø5.0 X 10mm': [], 'Ø5.0 X 11,5mm': [], 'Ø5.0 X 13mm': ['Lote HE-085'], 'Ø5.0 X 15mm': ['Lote HE-073']
+        }
+      },
+      MBP: {
+        medidas: [
+          'Ø3.5 X 10mm', 'Ø3.5 X 12mm', 'Ø3.5 X 15mm', 'Ø3.5 X 18mm', 'Ø3.5 X 21mm', 'Ø3.5 X 23mm', 'Ø3.5 X 24mm', 'Ø3.5 X 26mm', 'Ø3.5 X 28mm', 'Ø3.5 X 24mm C14', 'Ø3.5 X 26mm C16', 'Ø3.5 X 28mm C18',
+          'Ø4.5 X 10mm', 'Ø4.5 X 12mm', 'Ø4.5 X 15mm', 'Ø4.5 X 18mm', 'Ø4.5 X 21mm', 'Ø4.5 X 23mm', 'Ø4.5 X 24mm', 'Ø4.5 X 26mm', 'Ø4.5 X 28mm', 'Ø4.5 X 24mm C14', 'Ø4.5 X 26mm C16', 'Ø4.5 X 28mm C18',
+          'Ø5.5 X 9mm', 'Ø5.5 X 10mm', 'Ø5.5 X 12mm', 'Ø5.5 X 15mm', 'Ø5.5 X 18mm', 'Ø6.5 X 10mm', 'Ø6.5 X 12mm'
+        ],
+        lotes: {
+          'Ø3.5 X 10mm': [], 'Ø3.5 X 12mm': ['Lot-IB 0158'], 'Ø3.5 X 15mm': ['Lot-IB 0172'], 'Ø3.5 X 18mm': ['Lot-IB 0172'], 'Ø3.5 X 21mm': ['Lot-IB 0153'], 'Ø3.5 X 23mm': ['Lot-IB 0158'], 'Ø3.5 X 24mm': ['Lot-IB 0158'], 'Ø3.5 X 26mm': ['Lot-IB 0128', 'Lot-IB 0172'], 'Ø3.5 X 28mm': ['Lot-IB 0128', 'Lot-IB 0172'], 'Ø3.5 X 24mm C14': ['Lot-IB 0172'], 'Ø3.5 X 26mm C16': ['Lot-IB 0128', 'Lot-IB 0172'], 'Ø3.5 X 28mm C18': ['Lot-IB 0128', 'Lot-IB 0172'],
+          'Ø4.5 X 10mm': ['Lot-IB 0158'], 'Ø4.5 X 12mm': ['Lot-IB 0150', 'Lot-IB 0158'], 'Ø4.5 X 15mm': ['Lot-IB 0158'], 'Ø4.5 X 18mm': ['Lot-IB 0172'], 'Ø4.5 X 21mm': ['Lot-IB 0158'], 'Ø4.5 X 23mm': ['Lot-IB 0128', 'Lot-IB 0158'], 'Ø4.5 X 24mm': ['Lot-IB 0111', 'Lot-IB 0128'], 'Ø4.5 X 26mm': ['Lot-IB 0128', 'Lot-IB 0172'], 'Ø4.5 X 28mm': ['Lot-IB 0128', 'Lot-IB 0172'], 'Ø4.5 X 24mm C14': ['Lot-IB 0128'], 'Ø4.5 X 26mm C16': ['Lot-IB 0111', 'Lot-IB 0128'], 'Ø4.5 X 28mm C18': ['Lot-IB 0128'],
+          'Ø5.5 X 9mm': ['Lot-IB 0135', 'Lot-IB 0158'], 'Ø5.5 X 10mm': ['Lot-IB 0135', 'Lot-IB 0158'], 'Ø5.5 X 12mm': ['Lot-IB 0128', 'Lot-IB 0158'], 'Ø5.5 X 15mm': ['Lot-IB 0135', 'Lot-IB 0158'], 'Ø5.5 X 18mm': ['Lot-IB 0111'], 'Ø6.5 X 10mm': [], 'Ø6.5 X 12mm': []
+        }
+      },
+      MBT: {
+        medidas: [
+          'Ø3.5 X 10mm', 'Ø3.5 X 12mm', 'Ø3.5 X 15mm', 'Ø3.5 X 18mm', 'Ø3.5 X 21mm', 'Ø3.5 X 23mm', 'Ø3.5 X 24mm', 'Ø3.5 X 26mm', 'Ø3.5 X 28mm', 'Ø3.5 X 24mm C14', 'Ø3.5 X 26mm C16', 'Ø3.5 X 28mm C18',
+          'Ø4.5 X 10mm', 'Ø4.5 X 12mm', 'Ø4.5 X 15mm', 'Ø4.5 X 18mm', 'Ø4.5 X 21mm', 'Ø4.5 X 23mm', 'Ø4.5 X 24mm', 'Ø4.5 X 26mm', 'Ø4.5 X 28mm', 'Ø4.5 X 24mm C14', 'Ø4.5 X 26mm C16', 'Ø4.5 X 28mm C18',
+          'Ø5.5 X 9mm', 'Ø5.5 X 10mm', 'Ø5.5 X 12mm', 'Ø5.5 X 15mm', 'Ø5.5 X 18mm', 'Ø6.5 X 9mm', 'Ø6.5 X 10mm'
+        ],
+        lotes: {
+          'Ø3.5 X 10mm': [], 'Ø3.5 X 12mm': [], 'Ø3.5 X 15mm': [], 'Ø3.5 X 18mm': ['Lot-IBT 0171'], 'Ø3.5 X 21mm': ['Lot-IBT 0166', 'Lot-IBT 0171'], 'Ø3.5 X 23mm': ['Lot-IBT 0171'], 'Ø3.5 X 24mm': ['Lot-IBT 0126', 'Lot-IBT 0156'], 'Ø3.5 X 26mm': ['Lot-IBT 0116', 'Lot-IBT 0126'], 'Ø3.5 X 28mm': ['Lot-IBT 0116', 'Lot-IBT 0126'], 'Ø3.5 X 24mm C14': ['Lot-IBT 0171'], 'Ø3.5 X 26mm C16': ['Lot-IBT 0116'], 'Ø3.5 X 28mm C18': ['Lot-IBT 0116', 'Lot-IBT 0122'],
+          'Ø4.5 X 10mm': ['Lot-IBT 0171'], 'Ø4.5 X 12mm': ['Lot-IBT 0171'], 'Ø4.5 X 15mm': ['Lot-IBT 0171'], 'Ø4.5 X 18mm': ['Lot-IBT 0171'], 'Ø4.5 X 21mm': ['Lot-IBT 0157', 'Lot-IBT 0171'], 'Ø4.5 X 23mm': ['Lot-IBT 0112', 'Lot-IBT 0116'], 'Ø4.5 X 24mm': ['Lot-IBT 0112', 'Lot-IBT 0116'], 'Ø4.5 X 26mm': ['Lot-IBT 0116'], 'Ø4.5 X 28mm': ['Lot-IBT 0116'], 'Ø4.5 X 24mm C14': ['Lot-IBT 0116'], 'Ø4.5 X 26mm C16': ['Lot-IBT 0116'], 'Ø4.5 X 28mm C18': ['Lot-IBT 0116'],
+          'Ø5.5 X 9mm': ['Lot-IBT 0157'], 'Ø5.5 X 10mm': ['Lot-IBT 0157'], 'Ø5.5 X 12mm': ['Lot-IBT 0157'], 'Ø5.5 X 15mm': ['Lot-IBT 0157'], 'Ø5.5 X 18mm': ['Lot-IBT 0116'], 'Ø6.5 X 9mm': ['Lot-IBT 0171'], 'Ø6.5 X 10mm': ['Lot-IBT 0171']
+        }
+      },
+      CM: {
+        medidas: [
+          '3.30 X 8', '3.30 X 10', '3.30 X 11,5', '3.30 X 13', '3.30 X 16',
+          '3.75 X 8', '3.75 X 10', '3.75 X 11,5', '3.75 X 13', '3.75 X 16',
+          '4.2  X  8', '4.2  X  10', '4.2  X  11,5', '4.2  X  13', '4.2  X  16',
+          '5.0  X  8', '5.0  X  10', '5.0  X  11,5', '5.0  X  13', '5.0  X  16'
+        ],
+        lotes: {
+          '3.30 X 8': ['Lot-CMHI 0103'], '3.30 X 10': ['Lot-CMHI 0103'], '3.30 X 11,5': ['Lot-CMHI 0103'], '3.30 X 13': ['Lot-CMHI 0103'], '3.30 X 16': ['Lot-CMHI 0103'],
+          '3.75 X 8': ['Lot-CMHI 0103'], '3.75 X 10': [], '3.75 X 11,5': ['Lot-CMHI 0103'], '3.75 X 13': [], '3.75 X 16': ['Lot-CMHI 0103'],
+          '4.2  X  8': ['Lot-CMHI 0103'], '4.2  X  10': [], '4.2  X  11,5': ['Lot-CMHI 0103'], '4.2  X  13': ['Lot-CMHI 0103'], '4.2  X  16': ['Lot-CMHI 0103'],
+          '5.0  X  8': ['Lot-CMHI 0103'], '5.0  X  10': ['Lot-CMHI 0103'], '5.0  X  11,5': ['Lot-CMHI 0103'], '5.0  X  13': ['Lot-CMHI 0103'], '5.0  X  16': ['Lot-CMHI 0103']
+        }
+      },
+      CMU: {
+        medidas: [
+          'Ø3.0 X 6mm', 'Ø3.0 X 8mm', 'Ø3.0 X 10mm', 'Ø3.0 X 11,5mm', 'Ø3.0 X 13mm', 'Ø3.0 X 15mm', 'Ø3.0 X 18mm', 'Ø3.0 X 20mm',
+          'Ø3.5 X 6mm', 'Ø3.5 X 8mm', 'Ø3.5 X 10mm', 'Ø3.5 X 11,5mm', 'Ø3.5 X 13mm', 'Ø3.5 X 15mm', 'Ø3.5 X 18mm', 'Ø3.5 X 20mm',
+          'Ø4.0 X 6mm', 'Ø4.0 X 8mm', 'Ø4.0 X 10mm', 'Ø4.0 X 11,5mm', 'Ø4.0 X 13mm', 'Ø4.0 X 15mm', 'Ø4.0 X 18mm', 'Ø4.0 X 20mm',
+          'Ø4.5 X 6mm', 'Ø4.5 X 8mm', 'Ø4.5 X 10mm', 'Ø4.5 X 11,5mm', 'Ø4.5 X 13mm', 'Ø4.5 X 15mm', 'Ø4.5 X 18mm', 'Ø4.5 X 20mm',
+          'Ø5.0 X 6mm', 'Ø5.0 X 8mm', 'Ø5.0 X 10mm', 'Ø5.0 X 11,5mm', 'Ø5.0 X 13mm', 'Ø5.0 X 15mm', 'Ø5.0 X 18mm', 'Ø5.0 X 20mm',
+          'Ø5.5 X 6mm', 'Ø5.5 X 8mm', 'Ø5.5 X 10mm', 'Ø5.5 X 11,5mm', 'Ø5.5 X 13mm'
+        ],
+        lotes: {
+          'Ø3.0 X 6mm': ['Lot-CMU 0159'], 'Ø3.0 X 8mm': ['Lot-CMU 0159'], 'Ø3.0 X 10mm': ['Lot-CMU 0159'], 'Ø3.0 X 11,5mm': ['Lot-CMU 0123', 'Lot-CMU 0159'], 'Ø3.0 X 13mm': ['Lot-CMU 0159'], 'Ø3.0 X 15mm': ['Lot-CMU 0123', 'Lot-CMU 0159'], 'Ø3.0 X 18mm': ['Lot-CMU 0123', 'Lot-CMU 0159'], 'Ø3.0 X 20mm': ['Lot-CMU 0123', 'Lot-CMU 0159'],
+          'Ø3.5 X 6mm': ['Lot-CMU 0123', 'Lot-CMU 0159'], 'Ø3.5 X 8mm': ['Lot-CMU 0159'], 'Ø3.5 X 10mm': ['Lot-CMU 0159', 'Lot-CMU 0173'], 'Ø3.5 X 11,5mm': ['Lot-CMU 0142', 'Lot-CMU 0159'], 'Ø3.5 X 13mm': ['Lot-CMU 0142', 'Lot-CMU 0159'], 'Ø3.5 X 15mm': ['Lot-CMU 0142', 'Lot-CMU 0159'], 'Ø3.5 X 18mm': ['Lot-CMU 0123', 'Lot-CMU 0145', 'Lot-CMU 0159'], 'Ø3.5 X 20mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0159'],
+          'Ø4.0 X 6mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.0 X 8mm': ['Lot-CMU 0173'], 'Ø4.0 X 10mm': ['Lot-CMU 0142', 'Lot-CMU 0173'], 'Ø4.0 X 11,5mm': ['Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.0 X 13mm': ['Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.0 X 15mm': ['Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.0 X 18mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.0 X 20mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'],
+          'Ø4.5 X 6mm': ['Lot-CMU 0142', 'Lot-CMU 0173'], 'Ø4.5 X 8mm': ['Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.5 X 10mm': ['Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.5 X 11,5mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.5 X 13mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.5 X 15mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.5 X 18mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.5 X 20mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'],
+          'Ø5.0 X 6mm': ['Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø5.0 X 8mm': ['Lot-CMU 0142', 'Lot-CMU 0173'], 'Ø5.0 X 10mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø5.0 X 11,5mm': ['Lot-CMU 0119', 'Lot-CMU 0123'], 'Ø5.0 X 13mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø5.0 X 15mm': ['Lot-CMU 0119', 'Lot-CMU 0123'], 'Ø5.0 X 18mm': ['Lot-CMU 0119', 'Lot-CMU 0123'], 'Ø5.0 X 20mm': ['Lot-CMU 0119', 'Lot-CMU 0123'],
+          'Ø5.5 X 6mm': ['Lot-CMU 0142'], 'Ø5.5 X 8mm': ['Lot-CMU 0145', 'Lot-CMU 0173'], 'Ø5.5 X 10mm': ['Lot-CMU 0145'], 'Ø5.5 X 11,5mm': ['Lot-CMU 0145'], 'Ø5.5 X 13mm': ['Lot-CMU 0145', 'Lot-CMU 0173']
+        }
+      },
+      CMU3: {
+        medidas: [
+          'Ø3.0 X 6mm C3', 'Ø3.0 X 8mm C3', 'Ø3.0 X 10mm C3', 'Ø3.0 X 11,5mm C3', 'Ø3.0 X 13mm C3', 'Ø3.0 X 15mm C3', 'Ø3.0 X 18mm C3', 'Ø3.0 X 20mm C3',
+          'Ø3.5 X 6mm C3', 'Ø3.5 X 8mm C3', 'Ø3.5 X 10mm C3', 'Ø3.5 X 11,5mm C3', 'Ø3.5 X 13mm C3', 'Ø3.5 X 15mm C3', 'Ø3.5 X 18mm C3', 'Ø3.5 X 20mm C3',
+          'Ø4.0 X 6mm C3', 'Ø4.0 X 8mm C3', 'Ø4.0 X 10mm C3', 'Ø4.0 X 11,5mm C3', 'Ø4.0 X 13mm C3', 'Ø4.0 X 15mm C3', 'Ø4.0 X 18mm C3', 'Ø4.0 X 20mm C3',
+          'Ø4.5 X 6mm C3', 'Ø4.5 X 8mm C3', 'Ø4.5 X 10mm C3', 'Ø4.5 X 11,5mm C3', 'Ø4.5 X 13mm C3', 'Ø4.5 X 15mm C3', 'Ø4.5 X 18mm C3', 'Ø4.5 X 20mm C3',
+          'Ø5.0 X 6mm C3', 'Ø5.0 X 8mm C3', 'Ø5.0 X 10mm C3', 'Ø5.0 X 11,5mm C3', 'Ø5.0 X 13mm C3', 'Ø5.0 X 15mm C3', 'Ø5.0 X 18mm C3', 'Ø5.0 X 20mm C3',
+          'Ø5.5 X 6mm C3', 'Ø5.5 X 8mm C3', 'Ø5.5 X 10mm C3', 'Ø5.5 X 11,5mm C3', 'Ø5.5 X 13mm C3'
+        ],
+        lotes: {
+          'Ø3.0 X 6mm C3': ['Lot-CMU 0142'], 'Ø3.0 X 8mm C3': ['Lot-CMU 0173'], 'Ø3.0 X 10mm C3': ['Lot-CMU 0173'], 'Ø3.0 X 11,5mm C3': ['Lot-CMU 0142'], 'Ø3.0 X 13mm C3': [], 'Ø3.0 X 15mm C3': ['Lot-CMU 0142'], 'Ø3.0 X 18mm C3': [], 'Ø3.0 X 20mm C3': ['Lot-CMU 0123'],
+          'Ø3.5 X 6mm C3': ['Lot-CMU 0123'], 'Ø3.5 X 8mm C3': [], 'Ø3.5 X 10mm C3': ['Lot-CMU 0142'], 'Ø3.5 X 11,5mm C3': ['Lot-CMU 0142'], 'Ø3.5 X 13mm C3': [], 'Ø3.5 X 15mm C3': ['Lot-CMU 0142'], 'Ø3.5 X 18mm C3': ['Lot-CMU 0145'], 'Ø3.5 X 20mm C3': ['Lot-CMU 0119', 'Lot-CMU 0123'],
+          'Ø4.0 X 6mm C3': ['Lot-CMU 0119', 'Lot-CMU 0123'], 'Ø4.0 X 8mm C3': ['Lot-CMU 0142'], 'Ø4.0 X 10mm C3': ['Lot-CMU 0142'], 'Ø4.0 X 11,5mm C3': ['Lot-CMU 0142'], 'Ø4.0 X 13mm C3': ['Lot-CMU 0142'], 'Ø4.0 X 15mm C3': ['Lot-CMU 0123', 'Lot-CMU 0142'], 'Ø4.0 X 18mm C3': ['Lot-CMU 0119', 'Lot-CMU 0123'], 'Ø4.0 X 20mm C3': ['Lot-CMU 0119', 'Lot-CMU 0123'],
+          'Ø4.5 X 6mm C3': ['Lot-CMU 0123'], 'Ø4.5 X 8mm C3': ['Lot-CMU 0142'], 'Ø4.5 X 10mm C3': ['Lot-CMU 0145'], 'Ø4.5 X 11,5mm C3': ['Lot-CMU 0119', 'Lot-CMU 0123'], 'Ø4.5 X 13mm C3': ['Lot-CMU 0123', 'Lot-CMU 0145'], 'Ø4.5 X 15mm C3': ['Lot-CMU 0119', 'Lot-CMU 0123'], 'Ø4.5 X 18mm C3': ['Lot-CMU 0119', 'Lot-CMU 0123'], 'Ø4.5 X 20mm C3': ['Lot-CMU 0119', 'Lot-CMU 0123'],
+          'Ø5.0 X 6mm C3': ['Lot-CMU 0145', 'Lot-CMU 0173'], 'Ø5.0 X 8mm C3': ['Lot-CMU 0145'], 'Ø5.0 X 10mm C3': ['Lot-CMU 0145'], 'Ø5.0 X 11,5mm C3': ['Lot-CMU 0145'], 'Ø5.0 X 13mm C3': [], 'Ø5.0 X 15mm C3': [], 'Ø5.0 X 18mm C3': [], 'Ø5.0 X 20mm C3': [],
+          'Ø5.5 X 6mm C3': ['Lot-CMU 0145'], 'Ø5.5 X 8mm C3': ['Lot-CMU 0145'], 'Ø5.5 X 10mm C3': ['Lot-CMU 0145'], 'Ø5.5 X 11,5mm C3': ['Lot-CMU 0145'], 'Ø5.5 X 13mm C3': ['Lot-CMU 0145']
+        }
+      }
+    };
 
-  <!-- LOTE NUEVO -->
-  <div class="q hidden" id="pq4b">
-    <span class="label">Número de lote nuevo <span class="lote-nuevo-tag"><i class="ti ti-plus" style="font-size:10px"></i> nuevo</span></span>
-    <span class="sub">Se creará una columna nueva en la hoja</span>
-    <input type="text" id="lote-nuevo-inp" placeholder="Ej: Lot-MP 0180">
-  </div>
+    let state = { mov: 'dep', tipo: '', medida: '', lote: '' };
 
-  <!-- CANTIDAD -->
-  <div class="q hidden" id="pq5">
-    <span class="label">Cantidad</span>
-    <input type="number" min="1" placeholder="Ej: 5" id="cant-inp">
-    <span class="hint" id="hint-cant"></span>
-  </div>
+    function selMov(v) {
+      state.mov = v;
+      document.getElementById('rb-dep').classList.toggle('on', v === 'dep');
+      document.getElementById('rb-sal').classList.toggle('on', v === 'sal');
+      document.getElementById('pq-sal').classList.toggle('hidden', v !== 'sal');
+      updateHint();
+      updateSummary();
+    }
 
-  <!-- DATOS SALIDA -->
-  <div class="q hidden" id="pq-sal">
-    <div class="divider" style="margin:0 0 1.25rem"></div>
-    <span class="section-label">Datos de salida</span>
-    <div class="q">
-      <span class="label">Profesional o clínica</span>
-      <input type="text" id="profesional-inp" placeholder='Ej: Dr. Diego Sorrentini'>
-    </div>
-    <div class="q">
-      <span class="label">N° remito / vía cargo</span>
-      <input type="text" id="remito-inp" placeholder="Ej: 9090-57385">
-    </div>
-    <div class="q" style="margin-bottom:0">
-      <span class="label">N° presupuesto</span>
-      <input type="text" id="inp-presupuesto" placeholder="Autocompleta vía n8n" style="color:#9ca3af">
-      <span class="hint">Se autocompleta automáticamente</span>
-    </div>
-  </div>
+    function onTipo() {
+      const t = document.getElementById('tipo-sel').value;
+      state.tipo = t; state.medida = ''; state.lote = '';
+      
+      const mSel = document.getElementById('med-sel');
+      mSel.innerHTML = '<option value="">— Seleccioná la medida —</option>';
+      
+      if (t && DATA[t]) {
+        DATA[t].medidas.forEach(m => {
+          const o = document.createElement('option');
+          o.value = m; o.textContent = m;
+          mSel.appendChild(o);
+        });
+        document.getElementById('pq3').classList.remove('hidden');
+      } else {
+        document.getElementById('pq3').classList.add('hidden');
+      }
+      
+      document.getElementById('pq4').classList.add('hidden');
+      document.getElementById('pq4b').classList.add('hidden');
+      document.getElementById('pq5').classList.add('hidden');
+      hideSummary();
+    }
 
-  <!-- RESUMEN -->
-  <div id="summary-box" class="summary-box hidden">
-    <div style="font-size:11px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Resumen</div>
-    <div class="summary-row"><span class="sk">Tipo</span><span class="sv" id="sum-tipo">—</span></div>
-    <div class="summary-row"><span class="sk">Medida</span><span class="sv" id="sum-medida">—</span></div>
-    <div class="summary-row"><span class="sk">Lote</span><span class="sv" id="sum-lote">—</span></div>
-    <div class="summary-row"><span class="sk">Operación</span><span class="sv" id="sum-op">—</span></div>
-  </div>
-
-  <!-- MENSAJES -->
-  <div id="msg-error" class="alert alert-error hidden">
-    <i class="ti ti-alert-circle" style="font-size:16px;flex-shrink:0;margin-top:1px"></i>
-    <span id="msg-error-text"></span>
-  </div>
-  <div id="msg-success" class="alert alert-success hidden">
-    <i class="ti ti-check" style="font-size:16px;flex-shrink:0;margin-top:1px"></i>
-    <span>Movimiento registrado correctamente en la hoja de cálculo.</span>
-  </div>
-
-  <!-- BOTONES -->
-  <div style="display:flex;gap:8px;margin-top:1.25rem;align-items:center">
-    <button class="btn" id="btn-submit" onclick="submitForm()" disabled>
-      <i class="ti ti-send" style="font-size:14px;vertical-align:-1px;margin-right:4px"></i>
-      Registrar movimiento
-    </button>
-    <button class="btn-sec" onclick="resetForm()">Limpiar</button>
-  </div>
-</div>
-
-<script>
-  // ============================================================
-  // CONFIGURACIÓN — reemplazá esta URL con la de tu webhook n8n
-  // ============================================================
-  const N8N_LOTES_URL  = 'https://areatecnica.app.n8n.cloud/webhook/obtener-lotes';
-  const N8N_SUBMIT_URL = 'https://areatecnica.app.n8n.cloud/webhook/registrar-movimiento'; //
-
-  // ============================================================
-  // MEDIDAS POR TIPO (estáticas — no cambian)
-  // ============================================================
-  const MEDIDAS = {
-    MP: ['Ø3.0 X 6mm','Ø3.0 X 8mm','Ø3.0 X 10mm','Ø3.0 X 11,5mm','Ø3.0 X 13mm','Ø3.0 X 15mm','Ø3.0 X 18mm','Ø3.0 X 20mm','Ø3.5 X 6mm','Ø3.5 X 8mm','Ø3.5 X 10mm','Ø3.5 X 11,5mm','Ø3.5 X 13mm','Ø3.5 X 15mm','Ø3.5 X 18mm','Ø3.5 X 20mm','Ø4.0 X 6mm','Ø4.0 X 8mm','Ø4.0 X 10mm','Ø4.0 X 11,5mm','Ø4.0 X 13mm','Ø4.0 X 15mm','Ø4.0 X 18mm','Ø4.0 X 20mm','Ø4.5 X 6mm','Ø4.5 X 8mm','Ø4.5 X 10mm','Ø4.5 X 11,5mm','Ø4.5 X 13mm','Ø4.5 X 15mm','Ø4.5 X 18mm','Ø4.5 X 20mm','Ø5.0 X 6mm','Ø5.0 X 8mm','Ø5.0 X 10mm','Ø5.0 X 11,5mm','Ø5.0 X 13mm','Ø5.5 X 6mm','Ø5.5 X 8mm','Ø5.5 X 10mm','Ø5.5 X 11,5mm','Ø5.5 X 13mm'],
-    HI: ['Ø3.30 X 6,5mm','Ø3.30 X 8mm','Ø3.30 X 10mm','Ø3.30 X 11,5mm','Ø3.30 X 13mm','Ø3.30 X 16mm','Ø3,75 X 6,5mm','Ø3.75 X 8mm','Ø3.75 X 10mm','Ø3.75 X 11,5mm','Ø3.75 X 13mm','Ø3.75 X 16mm','Ø4,2 X 6,5mm','Ø4.2 X 8mm','Ø4.2 X 10mm','Ø4.2 X 11,5mm','Ø4.2 X 13mm','Ø4.2 X 16mm','Ø5,0 X 6,5mm','Ø5.0 X 8mm','Ø5.0 X 10mm','Ø5.0 X 11,5mm','Ø5.0 X 13mm','Ø5.0 X 16mm'],
-    HE: ['Ø3.30 X 8,5mm','Ø3.30 X 10mm','Ø3.30 X 11,5mm','Ø3.30 X 13mm','Ø3.30 X 15mm','Ø3.75 X 8,5mm','Ø3.75 X 10mm','Ø3.75 X 11,5mm','Ø3.75 X 13mm','Ø3.75 X 15mm','Ø4.0 X 6mm','Ø4.0 X 8,5mm','Ø4.0 X 10mm','Ø4.0 X 11,5mm','Ø4.0 X 13mm','Ø4.0 X 15mm','Ø5.0 X 8,5mm','Ø5.0 X 10mm','Ø5.0 X 11,5mm','Ø5.0 X 13mm','Ø5.0 X 15mm'],
-    MBP: ['Ø3.5 X 10mm','Ø3.5 X 12mm','Ø3.5 X 15mm','Ø3.5 X 18mm','Ø3.5 X 21mm','Ø3.5 X 23mm','Ø3.5 X 24mm','Ø3.5 X 26mm','Ø3.5 X 28mm','Ø3.5 X 24mm C14','Ø3.5 X 26mm C16','Ø3.5 X 28mm C18','Ø4.5 X 10mm','Ø4.5 X 12mm','Ø4.5 X 15mm','Ø4.5 X 18mm','Ø4.5 X 21mm','Ø4.5 X 23mm','Ø4.5 X 24mm','Ø4.5 X 26mm','Ø4.5 X 28mm','Ø4.5 X 24mm C14','Ø4.5 X 26mm C16','Ø4.5 X 28mm C18','Ø5.5 X 9mm','Ø5.5 X 10mm','Ø5.5 X 12mm','Ø5.5 X 15mm','Ø5.5 X 18mm','Ø6.5 X 10mm','Ø6.5 X 12mm'],
-    MBT: ['Ø3.5 X 10mm','Ø3.5 X 12mm','Ø3.5 X 15mm','Ø3.5 X 18mm','Ø3.5 X 21mm','Ø3.5 X 23mm','Ø3.5 X 24mm','Ø3.5 X 26mm','Ø3.5 X 28mm','Ø3.5 X 24mm C14','Ø3.5 X 26mm C16','Ø3.5 X 28mm C18','Ø4.5 X 10mm','Ø4.5 X 12mm','Ø4.5 X 15mm','Ø4.5 X 18mm','Ø4.5 X 21mm','Ø4.5 X 23mm','Ø4.5 X 24mm','Ø4.5 X 26mm','Ø4.5 X 28mm','Ø4.5 X 24mm C14','Ø4.5 X 26mm C16','Ø4.5 X 28mm C18','Ø5.5 X 9mm','Ø5.5 X 10mm','Ø5.5 X 12mm','Ø5.5 X 15mm','Ø5.5 X 18mm','Ø6.5 X 9mm','Ø6.5 X 10mm'],
-    CM: ['3.30 X 8','3.30 X 10','3.30 X 11,5','3.30 X 13','3.30 X 16','3.75 X 8','3.75 X 10','3.75 X 11,5','3.75 X 13','3.75 X 16','4.2  X  8','4.2  X  10','4.2  X  11,5','4.2  X  13','4.2  X  16','5.0  X  8','5.0  X  10','5.0  X  11,5','5.0  X  13','5.0  X  16'],
-    CMU: ['Ø3.0 X 6mm','Ø3.0 X 8mm','Ø3.0 X 10mm','Ø3.0 X 11,5mm','Ø3.0 X 13mm','Ø3.0 X 15mm','Ø3.0 X 18mm','Ø3.0 X 20mm','Ø3.5 X 6mm','Ø3.5 X 8mm','Ø3.5 X 10mm','Ø3.5 X 11,5mm','Ø3.5 X 13mm','Ø3.5 X 15mm','Ø3.5 X 18mm','Ø3.5 X 20mm','Ø4.0 X 6mm','Ø4.0 X 8mm','Ø4.0 X 10mm','Ø4.0 X 11,5mm','Ø4.0 X 13mm','Ø4.0 X 15mm','Ø4.0 X 18mm','Ø4.0 X 20mm','Ø4.5 X 6mm','Ø4.5 X 8mm','Ø4.5 X 10mm','Ø4.5 X 11,5mm','Ø4.5 X 13mm','Ø4.5 X 15mm','Ø4.5 X 18mm','Ø4.5 X 20mm','Ø5.0 X 6mm','Ø5.0 X 8mm','Ø5.0 X 10mm','Ø5.0 X 11,5mm','Ø5.0 X 13mm','Ø5.0 X 15mm','Ø5.0 X 18mm','Ø5.0 X 20mm','Ø5.5 X 6mm','Ø5.5 X 8mm','Ø5.5 X 10mm','Ø5.5 X 11,5mm','Ø5.5 X 13mm'],
-    CMU3: ['Ø3.0 X 6mm C3','Ø3.0 X 8mm C3','Ø3.0 X 10mm C3','Ø3.0 X 11,5mm C3','Ø3.0 X 13mm C3','Ø3.0 X 15mm C3','Ø3.0 X 18mm C3','Ø3.0 X 20mm C3','Ø3.5 X 6mm C3','Ø3.5 X 8mm C3','Ø3.5 X 10mm C3','Ø3.5 X 11,5mm C3','Ø3.5 X 13mm C3','Ø3.5 X 15mm C3','Ø3.5 X 18mm C3','Ø3.5 X 20mm C3','Ø4.0 X 6mm C3','Ø4.0 X 8mm C3','Ø4.0 X 10mm C3','Ø4.0 X 11,5mm C3','Ø4.0 X 13mm C3','Ø4.0 X 15mm C3','Ø4.0 X 18mm C3','Ø4.0 X 20mm C3','Ø4.5 X 6mm C3','Ø4.5 X 8mm C3','Ø4.5 X 10mm C3','Ø4.5 X 11,5mm C3','Ø4.5 X 13mm C3','Ø4.5 X 15mm C3','Ø4.5 X 18mm C3','Ø4.5 X 20mm C3','Ø5.0 X 6mm C3','Ø5.0 X 8mm C3','Ø5.0 X 10mm C3','Ø5.0 X 11,5mm C3','Ø5.0 X 13mm C3','Ø5.0 X 15mm C3','Ø5.0 X 18mm C3','Ø5.0 X 20mm C3','Ø5.5 X 6mm C3','Ø5.5 X 8mm C3','Ø5.5 X 10mm C3','Ø5.5 X 11,5mm C3','Ø5.5 X 13mm C3']
-  };
-
-  let state = { mov: 'dep', tipo: '', medida: '', lote: '', rowIndex: null };
-
-  // ============================================================
-  // INTERACCIONES
-  // ============================================================
-  function selMov(v) {
-    state.mov = v;
-    document.getElementById('rb-dep').classList.toggle('on', v === 'dep');
-    document.getElementById('rb-sal').classList.toggle('on', v === 'sal');
-    document.getElementById('pq-sal').classList.toggle('hidden', v !== 'sal');
-    updateSummary();
-    checkSubmit();
-  }
-
-  function onTipo() {
-    const t = document.getElementById('tipo-sel').value;
-    state.tipo = t; state.medida = ''; state.lote = ''; state.rowIndex = null;
-    const mSel = document.getElementById('med-sel');
-    mSel.innerHTML = '<option value="">— Seleccioná la medida —</option>';
-    if (t && MEDIDAS[t]) {
-      MEDIDAS[t].forEach(m => {
+    function onMedida() {
+      const m = document.getElementById('med-sel').value;
+      state.medida = m; state.lote = '';
+      
+      const lSel = document.getElementById('lote-sel');
+      lSel.innerHTML = '<option value="">— Seleccioná el lote —</option>';
+      
+      if (!m) {
+        document.getElementById('pq4').classList.add('hidden');
+        document.getElementById('pq5').classList.add('hidden');
+        return;
+      }
+      
+      const lotesDisponibles = DATA[state.tipo].lotes[m] || [];
+      
+      lotesDisponibles.forEach(l => {
         const o = document.createElement('option');
-        o.value = m; o.textContent = m; mSel.appendChild(o);
+        o.value = l; o.textContent = l;
+        lSel.appendChild(o);
       });
-      document.getElementById('pq3').classList.remove('hidden');
-    } else {
-      document.getElementById('pq3').classList.add('hidden');
+      
+      // Opción universal para crear nuevos lotes
+      const oN = document.createElement('option');
+      oN.value = 'nuevo'; oN.textContent = '+ Crear nuevo lote';
+      lSel.appendChild(oN);
+      
+      document.getElementById('pq4').classList.remove('hidden');
+      document.getElementById('hint-lote').textContent = lotesDisponibles.length > 0 
+        ? `${lotesDisponibles.length} lote(s) detectado(s) en catálogo.` 
+        : 'No hay lotes registrados para esta medida. Se creará uno nuevo.';
+        
+      document.getElementById('pq5').classList.add('hidden');
+      hideSummary();
     }
-    hideLotes();
-    hideSummary();
-    checkSubmit();
-  }
 
-  function onMedida() {
-    const m = document.getElementById('med-sel').value;
-    state.medida = m; state.lote = ''; state.rowIndex = null;
-    hideLotes();
-    hideSummary();
-    checkSubmit();
-    if (m) fetchLotes(state.tipo, m);
-  }
+    function onLote() {
+      const v = document.getElementById('lote-sel').value;
+      state.lote = v;
+      
+      document.getElementById('pq4b').classList.toggle('hidden', v !== 'nuevo');
+      if (v) {
+        document.getElementById('pq5').classList.remove('hidden');
+        updateHint();
+      } else {
+        document.getElementById('pq5').classList.add('hidden');
+      }
+      updateSummary();
+    }
 
-  // ============================================================
-  // FETCH LOTES DESDE N8N (en tiempo real desde Google Sheets)
-  // ============================================================
- // ============================================================
-  // ENVÍO A N8N (Corregido)
-  // ============================================================
-  async function submitForm() {
-    hideMsg();
-    const lote = state.lote === 'nuevo'
-      ? document.getElementById('lote-nuevo-inp').value.trim()
-      : state.lote;
-    const cantidad = parseInt(document.getElementById('cant-inp').value);
+    function updateHint() {
+      if (state.lote) {
+        document.getElementById('hint-cant').textContent = 'Cantidad a ' + 
+          (state.mov === 'dep' ? 'agregar a ' : 'retirar de ') + 
+          (state.lote === 'nuevo' ? 'nuevo lote' : state.lote);
+      }
+    }
 
-    if (!lote) { showError('Ingresá el número del nuevo lote.'); return; }
-    if (!cantidad || cantidad < 1) { showError('Ingresá una cantidad válida.'); return; }
+    function updateSummary() {
+      const el = document.getElementById('preview-summary');
+      const c = document.getElementById('summary-content');
+      if (!state.tipo || !state.medida || !state.lote) { el.classList.add('hidden'); return; }
+      
+      const movLabel = state.lote === 'nuevo' ? 'Depósito (Lote Nuevo)' : (state.mov === 'dep' ? 'Depósito' : 'Salida');
+      c.innerHTML = `<strong>Tipo Implante:</strong> ${state.tipo}<br>
+                     <strong>Medida:</strong> ${state.medida}<br>
+                     <strong>Lote:</strong> ${state.lote === 'nuevo' ? '<em>A definir en campo nuevo</em>' : state.lote}<br>
+                     <strong>Operación:</strong> ${movLabel}`;
+      el.classList.remove('hidden');
+    }
 
-    const payload = {
-      tipo_imp: state.tipo,
-      medida: state.medida,
-      hoja: state.tipo,
-      tipo_mov: state.mov,
-      lote_sel: state.lote,
-      lote_nombre: lote,
-      cantidad: cantidad,
-      rowIndex: state.rowIndex,
-      // AQUÍ SE CORRIGIERON LOS IDs PARA QUE COINCIDAN CON EL HTML:
-      profesional: document.getElementById('profesional-inp').value.trim(),
-      nro_remito: document.getElementById('remito-inp').value.trim(),
-      nro_presupuesto: document.getElementById('inp-presupuesto').value.trim()
-    };
+    function hideSummary() { document.getElementById('preview-summary').classList.add('hidden'); }
 
-    const btn = document.getElementById('btn-submit');
-    btn.disabled = true;
-    btn.innerHTML = '<div class="spinner" style="display:inline-block;vertical-align:-3px;margin-right:6px"></div> Registrando...';
+    // ==========================================
+    // FUNCIÓN DE ENVÍO REAL CONECTADA A N8N
+    // ==========================================
+    function submitPreview() {
+      // Recordá usar /webhook-test/ cuando estés probando en vivo en el panel de n8n
+      const N8N_SUBMIT_URL = 'https://areatecnica.app.n8n.cloud/webhook-test/registrar-movimiento';
 
-    try {
-      const res = await fetch(N8N_SUBMIT_URL, {
+      // Estructuramos el objeto JSON con todos los campos del formulario
+      const payload = {
+        tipo_mov: state.mov,
+        tipo_implante: state.tipo,
+        medida: state.medida,
+        lote: state.lote === 'nuevo' ? document.getElementById('lote-nuevo-inp').value : state.lote,
+        cantidad: document.getElementById('cant-inp').value,
+        profesional: document.getElementById('profesional-inp') ? document.getElementById('profesional-inp').value : '',
+        remito: document.getElementById('remito-inp') ? document.getElementById('remito-inp').value : ''
+      };
+
+      // Validamos brevemente que la cantidad no esté vacía
+      if (!payload.cantidad || payload.cantidad < 1) {
+        alert('Por favor, ingresá una cantidad válida mayor a 0.');
+        return;
+      }
+
+      // Deshabilitamos el botón y cambiamos el texto a modo carga
+      const btn = document.querySelector('.btn');
+      const originalText = btn.textContent;
+      btn.textContent = 'Enviando...';
+      btn.disabled = true;
+
+      // Disparamos la petición HTTP POST hacia el Servidor n8n
+      fetch(N8N_SUBMIT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
+      })
+      .then(response => {
+        if (response.ok) {
+          // Si el servidor responde con estatus 200-299, mostramos éxito
+          document.getElementById('confirm-msg').classList.remove('hidden');
+          setTimeout(() => document.getElementById('confirm-msg').classList.add('hidden'), 5000);
+          resetForm();
+        } else {
+          alert('n8n recibió el paquete, pero ocurrió un error interno en el flujo.');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Error de red. Asegurate de que n8n esté activo y escuchando en modo "Listen for test event".');
+      })
+      .finally(() => {
+        // Restauramos el botón a su estado original
+        btn.textContent = originalText;
+        btn.disabled = false;
       });
-      if (!res.ok) throw new Error('Error ' + res.status);
-      document.getElementById('msg-success').classList.remove('hidden');
-      setTimeout(() => resetForm(), 3000);
-    } catch (err) {
-      showError('Error al registrar. Verificá la conexión con n8n.');
-      btn.disabled = false;
-      btn.innerHTML = '<i class="ti ti-send" style="font-size:14px;vertical-align:-1px;margin-right:4px"></i>Registrar movimiento';
     }
-  }
 
-  // ============================================================
-  // ENVÍO A N8N
-  // ============================================================
-  async function submitForm() {
-    hideMsg();
-    const lote = state.lote === 'nuevo'
-      ? document.getElementById('lote-nuevo-inp').value.trim()
-      : state.lote;
-    const cantidad = parseInt(document.getElementById('cant-inp').value);
-
-    if (!lote) { showError('Ingresá el número del nuevo lote.'); return; }
-    if (!cantidad || cantidad < 1) { showError('Ingresá una cantidad válida.'); return; }
-
-    const payload = {
-      tipo_imp: state.tipo,
-      medida: state.medida,
-      hoja: state.tipo,
-      tipo_mov: state.mov,
-      lote_sel: state.lote,
-      lote_nombre: lote,
-      cantidad: cantidad,
-      rowIndex: state.rowIndex,
-      profesional: document.getElementById('inp-profesional').value.trim(),
-      nro_remito: document.getElementById('inp-remito').value.trim(),
-      nro_presupuesto: document.getElementById('inp-presupuesto').value.trim()
-    };
-
-    const btn = document.getElementById('btn-submit');
-    btn.disabled = true;
-    btn.innerHTML = '<div class="spinner" style="display:inline-block;vertical-align:-3px;margin-right:6px"></div> Registrando...';
-
-    try {
-      const res = await fetch(N8N_SUBMIT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) throw new Error('Error ' + res.status);
-      document.getElementById('msg-success').classList.remove('hidden');
-      setTimeout(() => resetForm(), 3000);
-    } catch (err) {
-      showError('Error al registrar. Verificá la conexión con n8n.');
-      btn.disabled = false;
-      btn.innerHTML = '<i class="ti ti-send" style="font-size:14px;vertical-align:-1px;margin-right:4px"></i>Registrar movimiento';
-    }
-  }
-
-  // ============================================================
-  // HELPERS
-  // ============================================================
-  function updateSummary() {
-    if (!state.tipo || !state.medida || !state.lote) { hideSummary(); return; }
-    document.getElementById('sum-tipo').textContent = state.tipo;
-    document.getElementById('sum-medida').textContent = state.medida;
-    document.getElementById('sum-lote').textContent = state.lote === 'nuevo' ? '(nuevo lote)' : state.lote;
-    document.getElementById('sum-op').textContent = state.lote === 'nuevo' ? 'Depósito — lote nuevo' : (state.mov === 'dep' ? 'Depósito' : 'Salida');
-    document.getElementById('summary-box').classList.remove('hidden');
-  }
-
-  function hideSummary() { document.getElementById('summary-box').classList.add('hidden'); }
-
-  function hideLotes() {
-    ['pq4','pq4b','pq5'].forEach(id => document.getElementById(id).classList.add('hidden'));
-    document.getElementById('lotes-loading').classList.add('hidden');
-  }
-
-  function checkSubmit() {
-    const ok = state.tipo && state.medida && state.lote;
-    document.getElementById('btn-submit').disabled = !ok;
-  }
-
-  function showError(msg) {
-    document.getElementById('msg-error-text').textContent = msg;
-    document.getElementById('msg-error').classList.remove('hidden');
-  }
-
-  function hideMsg() {
-    document.getElementById('msg-error').classList.add('hidden');
-    document.getElementById('msg-success').classList.add('hidden');
-  }
-
-  function resetForm() {
-    document.getElementById('tipo-sel').value = '';
-    document.getElementById('lote-nuevo-inp').value = '';
-    document.getElementById('cant-inp').value = '';
-    document.getElementById('inp-profesional').value = '';
-    document.getElementById('inp-remito').value = '';
-    document.getElementById('inp-presupuesto').value = '';
-    state = { mov: 'dep', tipo: '', medida: '', lote: '', rowIndex: null };
-    ['pq3','pq4','pq4b','pq5','pq-sal','summary-box','lotes-loading'].forEach(id =>
-      document.getElementById(id).classList.add('hidden'));
-    selMov('dep');
-    hideMsg();
-    document.getElementById('btn-submit').disabled = true;
-    document.getElementById('btn-submit').innerHTML =
-      '<i class="ti ti-send" style="font-size:14px;vertical-align:-1px;margin-right:4px"></i>Registrar movimiento';
-  }
-</script>
-</body>
-</html>
+    function resetForm() {
+      document.getElementById('tipo-sel').value = '';
+      document.getElementById('lote-nuevo-inp').value = '';
+      document.getElementById('cant-inp').value = '';
+      if(document.getElementById('profesional-inp')) document.getElementById('profesional-inp').value = '';
+      if(document.getElementById('remito-inp')) document.getElementById('remito-inp').value = '';
+      state = { mov: 'dep', tipo: '', medida: '', lote: '' };
