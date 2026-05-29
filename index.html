@@ -1,4 +1,4 @@
-cat > /mnt/user-data/outputs/index.html << 'HTMLEOF'
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -243,11 +243,11 @@ cat > /mnt/user-data/outputs/index.html << 'HTMLEOF'
     <span class="section-label">Datos de salida</span>
     <div class="q">
       <span class="label">Profesional o clínica</span>
-      <input type="text" id="inp-profesional" placeholder="Ej: Dr. García Ramírez">
+      <input type="text" id="profesional-inp" placeholder='Ej: Dr. Diego Sorrentini'>
     </div>
     <div class="q">
       <span class="label">N° remito / vía cargo</span>
-      <input type="text" id="inp-remito" placeholder="Ej: REM-0412">
+      <input type="text" id="remito-inp" placeholder="Ej: 9090-57385">
     </div>
     <div class="q" style="margin-bottom:0">
       <span class="label">N° presupuesto</span>
@@ -289,8 +289,8 @@ cat > /mnt/user-data/outputs/index.html << 'HTMLEOF'
   // ============================================================
   // CONFIGURACIÓN — reemplazá esta URL con la de tu webhook n8n
   // ============================================================
-  const N8N_LOTES_URL  = 'https://TU_N8N_URL/webhook/lotes';
-  const N8N_SUBMIT_URL = 'https://TU_N8N_URL/webhook/form-submit';
+  const N8N_LOTES_URL  = 'https://areatecnica.app.n8n.cloud/webhook/obtener-lotes';
+  const N8N_SUBMIT_URL = 'https://areatecnica.app.n8n.cloud/webhook/registrar-movimiento'; //
 
   // ============================================================
   // MEDIDAS POR TIPO (estáticas — no cambian)
@@ -351,63 +351,52 @@ cat > /mnt/user-data/outputs/index.html << 'HTMLEOF'
   // ============================================================
   // FETCH LOTES DESDE N8N (en tiempo real desde Google Sheets)
   // ============================================================
-  async function fetchLotes(tipo, medida) {
-    document.getElementById('lotes-loading').classList.remove('hidden');
+ // ============================================================
+  // ENVÍO A N8N (Corregido)
+  // ============================================================
+  async function submitForm() {
     hideMsg();
+    const lote = state.lote === 'nuevo'
+      ? document.getElementById('lote-nuevo-inp').value.trim()
+      : state.lote;
+    const cantidad = parseInt(document.getElementById('cant-inp').value);
+
+    if (!lote) { showError('Ingresá el número del nuevo lote.'); return; }
+    if (!cantidad || cantidad < 1) { showError('Ingresá una cantidad válida.'); return; }
+
+    const payload = {
+      tipo_imp: state.tipo,
+      medida: state.medida,
+      hoja: state.tipo,
+      tipo_mov: state.mov,
+      lote_sel: state.lote,
+      lote_nombre: lote,
+      cantidad: cantidad,
+      rowIndex: state.rowIndex,
+      // AQUÍ SE CORRIGIERON LOS IDs PARA QUE COINCIDAN CON EL HTML:
+      profesional: document.getElementById('profesional-inp').value.trim(),
+      nro_remito: document.getElementById('remito-inp').value.trim(),
+      nro_presupuesto: document.getElementById('inp-presupuesto').value.trim()
+    };
+
+    const btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner" style="display:inline-block;vertical-align:-3px;margin-right:6px"></div> Registrando...';
 
     try {
-      const res = await fetch(N8N_LOTES_URL, {
+      const res = await fetch(N8N_SUBMIT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tipo_imp: tipo, medida: medida })
+        body: JSON.stringify(payload)
       });
-
       if (!res.ok) throw new Error('Error ' + res.status);
-      const data = await res.json();
-      // Espera: { lotes: ["Lot-MP 0170", "Lot-MP 0169", ...], rowIndex: 2 }
-      mostrarLotes(data.lotes || [], data.rowIndex || null);
-
+      document.getElementById('msg-success').classList.remove('hidden');
+      setTimeout(() => resetForm(), 3000);
     } catch (err) {
-      document.getElementById('lotes-loading').classList.add('hidden');
-      showError('No se pudo conectar con n8n para obtener los lotes. Verificá que el webhook esté activo.');
+      showError('Error al registrar. Verificá la conexión con n8n.');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-send" style="font-size:14px;vertical-align:-1px;margin-right:4px"></i>Registrar movimiento';
     }
-  }
-
-  function mostrarLotes(lotes, rowIndex) {
-    document.getElementById('lotes-loading').classList.add('hidden');
-    state.rowIndex = rowIndex;
-
-    const lSel = document.getElementById('lote-sel');
-    lSel.innerHTML = '<option value="">— Seleccioná el lote —</option>';
-
-    lotes.forEach(l => {
-      const o = document.createElement('option');
-      o.value = l; o.textContent = l; lSel.appendChild(o);
-    });
-
-    const oN = document.createElement('option');
-    oN.value = 'nuevo'; oN.textContent = '+ Crear nuevo lote';
-    lSel.appendChild(oN);
-
-    document.getElementById('pq4').classList.remove('hidden');
-    document.getElementById('hint-lote').textContent =
-      lotes.length > 0
-        ? `${lotes.length} lote(s) disponible(s) — datos en tiempo real desde la hoja`
-        : 'Sin lotes con stock para esta medida. Podés crear uno nuevo.';
-  }
-
-  function onLote() {
-    const v = document.getElementById('lote-sel').value;
-    state.lote = v;
-    document.getElementById('pq4b').classList.toggle('hidden', v !== 'nuevo');
-    document.getElementById('pq5').classList.toggle('hidden', !v);
-    if (v) {
-      document.getElementById('hint-cant').textContent =
-        'Cantidad a ' + (state.mov === 'dep' ? 'agregar' : 'retirar') +
-        (v === 'nuevo' ? ' al nuevo lote' : ' de ' + v);
-    }
-    updateSummary();
-    checkSubmit();
   }
 
   // ============================================================
@@ -510,5 +499,3 @@ cat > /mnt/user-data/outputs/index.html << 'HTMLEOF'
 </script>
 </body>
 </html>
-HTMLEOF
-hecho "done"
