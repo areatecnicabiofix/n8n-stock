@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulario de Gestión de Implantes — Catálogo Real</title>
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+  <style>
+    * { box-sizing: border-box; }
+    body { 
+      margin: 0; 
+      padding: 2rem; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f7fb;
+      display: flex;
+      justify-content: center;
+    }
+    
+    .preview-form { max-width: 550px; width: 100%; }
+    .card { 
+      background: #ffffff; 
+      border: 0.5px solid #e2e8f0; 
+      border-radius: 12px; 
+      padding: 1.5rem; 
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .q { margin-bottom: 1.25rem; }
+    .q.hidden { display: none; }
+    .hidden { display: none; }
+    
+    .label { font-size: 14px; font-weight: 500; color: #1e293b; display: block; margin-bottom: 5px; }
+    .sub { font-size: 12px; color: #64748b; display: block; margin-bottom: 7px; }
+    .hint { font-size: 11px; color: #94a3b8; margin-top: 5px; display: block; }
+    
+    select, input[type=text], input[type=number] { 
+      width: 100%; 
+      padding: 10px 12px; 
+      border-radius: 6px; 
+      border: 0.5px solid #cbd5e1; 
+      background: #f8fafc; 
+      font-size: 14px; 
+      color: #1e293b; 
+    }
+    select:focus, input:focus { outline: none; border-color: #0284c7; background: #fff; }
+    
+    .radio-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .ropt { 
+      display: flex; align-items: center; gap: 6px; padding: 10px 16px; 
+      border: 0.5px solid #cbd5e1; border-radius: 6px; cursor: pointer; 
+      font-size: 14px; background: #f8fafc; color: #1e293b; transition: all .15s; 
+    }
+    .ropt.on { background: #e0f2fe; color: #0369a1; border-color: #0369a1; font-weight: 500; }
+    
+    .btn { padding: 10px 22px; border-radius: 6px; background: #0284c7; color: #ffffff; font-size: 14px; font-weight: 500; border: none; cursor: pointer; }
+    .btn-sec { padding: 9px 16px; border-radius: 6px; background: transparent; color: #64748b; font-size: 13px; border: 0.5px solid #cbd5e1; cursor: pointer; }
+    .divider { height: 0.5px; background: #e2e8f0; margin: 1.25rem 0; }
+    .section-label { font-size: 11px; font-weight: 500; color: #94a3b8; text-transform: uppercase; letter-spacing: .06em; margin: 1.25rem 0 .75rem; display: block; }
+    
+    .success-box { background: #f0fdf4; border: 0.5px solid #bbf7d0; border-radius: 6px; padding: 10px 14px; font-size: 13px; color: #166534; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+
+  <div class="card preview-form">
+    <div style="margin-bottom:1.25rem">
+      <div style="font-size:18px;font-weight:600;color:#1e293b;margin-bottom:3px">Registro de Movimiento de Stock</div>
+      <div style="font-size:13px;color:#64748b">Sistema de Trazabilidad de Implantes Dentales</div>
+    </div>
+
+    <div class="q" id="pq1">
+      <span class="label">Tipo de movimiento</span>
+      <div class="radio-row">
+        <div class="ropt on" id="rb-dep" onclick="selMov('dep')"><i class="ti ti-arrow-bar-to-down"></i> Depósito</div>
+        <div class="ropt" id="rb-sal" onclick="selMov('sal')"><i class="ti ti-arrow-bar-up"></i> Salida</div>
+      </div>
+      <span class="hint">Depósito = agregar stock · Salida = retirar para uso clínico</span>
+    </div>
+
+    <div class="q" id="pq2">
+      <span class="label">Tipo de implante</span>
+      <select id="tipo-sel" onchange="onTipo()">
+        <option value="">— Seleccioná el tipo —</option>
+        <option value="MP">Monopieza (MP)</option>
+        <option value="HI">Hexágono Interno (HI)</option>
+        <option value="HE">Hexágono Externo (HE)</option>
+        <option value="MBP">Monopieza Basal Pulido (MBP)</option>
+        <option value="MBT">Monopieza Basal Tratado (MBT)</option>
+        <option value="CM">Cono Morse (CM)</option>
+        <option value="CMU">Compresivo MultiUnit (CMU)</option>
+        <option value="CMU3">Compresivo MultiUnit C3 (CMU3)</option>
+      </select>
+    </div>
+
+    <div class="q hidden" id="pq3">
+      <span class="label">Medida (Diámetro x Longitud)</span>
+      <select id="med-sel" onchange="onMedida()">
+        <option value="">— Seleccioná la medida —</option>
+      </select>
+    </div>
+
+    <div class="q hidden" id="pq4">
+      <span class="label">Lote asignado</span>
+      <select id="lote-sel" onchange="onLote()">
+        <option value="">— Seleccioná el lote —</option>
+      </select>
+      <span class="hint" id="hint-lote"></span>
+    </div>
+
+    <div class="q hidden" id="pq4b">
+      <span class="label">Número de lote nuevo</span>
+      <span class="sub">Ingresá el identificador único del nuevo lote</span>
+      <input type="text" id="lote-nuevo-inp" placeholder="Ej: Lot-MP 0180">
+    </div>
+
+    <div class="q hidden" id="pq5">
+      <span class="label">Cantidad</span>
+      <input type="number" min="1" placeholder="Ej: 5" id="cant-inp">
+      <span class="hint" id="hint-cant"></span>
+    </div>
+
+    <div class="q hidden" id="pq-sal">
+      <div class="divider" style="margin:0 0 1.25rem"></div>
+      <span class="section-label">Datos Clínicos de Salida</span>
+
+      <div class="q">
+        <span class="label">Profesional o clínica</span>
+        <input type="text" placeholder='Ej: Dr. García Ramírez'>
+      </div>
+      <div class="q">
+        <span class="label">N° remito / vía de cargo</span>
+        <input type="text" placeholder="Ej: REM-0412">
+      </div>
+      <div class="q" style="margin-bottom:0">
+        <span class="label">N° presupuesto</span>
+        <input type="text" value="PRES-2026-0183" style="color:#94a3b8" readonly>
+        <span class="hint">Autocompletado automático vía n8n</span>
+      </div>
+    </div>
+
+    <div id="preview-summary" class="hidden" style="margin:1rem 0">
+      <div class="divider" style="margin:.75rem 0"></div>
+      <div style="font-size:12px;color:#64748b;margin-bottom:6px">Resumen de transacción:</div>
+      <div id="summary-content" style="font-size:13px;color:#1e293b;line-height:1.8"></div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:1rem;align-items:center">
+      <button class="btn" onclick="submitPreview()">Registrar movimiento</button>
+      <button class="btn-sec" onclick="resetForm()">Limpiar formulario</button>
+    </div>
+
+    <div id="confirm-msg" class="hidden" style="margin-top:1rem">
+      <div class="success-box"><i class="ti ti-check"></i> Movimiento enviado a n8n y registrado correctamente en la base de datos.</div>
+    </div>
+  </div>
+
+  <script>
+    // BASE DE DATOS ESTRUCTURADA BASADA EXACTAMENTE EN TU DOCUMENTO
+    const DATA = {
+      MP: {
+        medidas: [
+          'Ø3.0 X 6mm', 'Ø3.0 X 8mm', 'Ø3.0 X 10mm', 'Ø3.0 X 11,5mm', 'Ø3.0 X 13mm', 'Ø3.0 X 15mm', 'Ø3.0 X 18mm', 'Ø3.0 X 20mm',
+          'Ø3.5 X 6mm', 'Ø3.5 X 8mm', 'Ø3.5 X 10mm', 'Ø3.5 X 11,5mm', 'Ø3.5 X 13mm', 'Ø3.5 X 15mm', 'Ø3.5 X 18mm', 'Ø3.5 X 20mm',
+          'Ø4.0 X 6mm', 'Ø4.0 X 8mm', 'Ø4.0 X 10mm', 'Ø4.0 X 11,5mm', 'Ø4.0 X 13mm', 'Ø4.0 X 15mm', 'Ø4.0 X 18mm', 'Ø4.0 X 20mm',
+          'Ø4.5 X 6mm', 'Ø4.5 X 8mm', 'Ø4.5 X 10mm', 'Ø4.5 X 11,5mm', 'Ø4.5 X 13mm', 'Ø4.5 X 15mm', 'Ø4.5 X 18mm', 'Ø4.5 X 20mm',
+          'Ø5.0 X 6mm', 'Ø5.0 X 8mm', 'Ø5.0 X 10mm', 'Ø5.0 X 11,5mm', 'Ø5.0 X 13mm',
+          'Ø5.5 X 6mm', 'Ø5.5 X 8mm', 'Ø5.5 X 10mm', 'Ø5.5 X 11,5mm', 'Ø5.5 X 13mm'
+        ],
+        lotes: {
+          'Ø3.0 X 6mm': ['Lot-MP 0170'], 'Ø3.0 X 8mm': ['Lot-MP 0169', 'Lot-MP 0170'], 'Ø3.0 X 10mm': ['Lot-MP 0170'], 'Ø3.0 X 11,5mm': ['Lot-MP 0170'], 'Ø3.0 X 13mm': ['Lot-MP 0170'], 'Ø3.0 X 15mm': ['Lot-MP 0170'], 'Ø3.0 X 18mm': ['Lot-MP 0169', 'Lot-MP 0170'], 'Ø3.0 X 20mm': ['Lot-MP 0139', 'Lot-MP 0169', 'Lot-MP 0170'],
+          'Ø3.5 X 6mm': ['Lot-MP 0169', 'Lot-MP 0170'], 'Ø3.5 X 8mm': ['Lot-MP 0170'], 'Ø3.5 X 10mm': ['Lot-MP 0170'], 'Ø3.5 X 11,5mm': ['Lot-MP 0170'], 'Ø3.5 X 13mm': ['Lot-MP 0170'], 'Ø3.5 X 15mm': [], 'Ø3.5 X 18mm': ['Lot-MP 0170'], 'Ø3.5 X 20mm': ['Lot-MP 0169', 'Lot-MP 0170'],
+          'Ø4.0 X 6mm': ['Lot-MP 0170'], 'Ø4.0 X 8mm': ['Lot-MP 0170'], 'Ø4.0 X 10mm': ['Lot-MP 0170'], 'Ø4.0 X 11,5mm': ['Lot-MP 0170'], 'Ø4.0 X 13mm': [], 'Ø4.0 X 15mm': ['Lot-MP 0170'], 'Ø4.0 X 18mm': ['Lot-MP 0161', 'Lot-MP 0169', 'Lot-MP 0170'], 'Ø4.0 X 20mm': ['Lot-MP 0148', 'Lot-MP 0169', 'Lot-MP 0170'],
+          'Ø4.5 X 6mm': ['Lot-MP 0148', 'Lot-MP 0155'], 'Ø4.5 X 8mm': ['Lot-MP 0155', 'Lot-MP 0168'], 'Ø4.5 X 10mm': ['Lot-MP 0155', 'Lot-MP 0169'], 'Ø4.5 X 11,5mm': ['Lot-MP 0169'], 'Ø4.5 X 13mm': ['Lot-MP 0169'], 'Ø4.5 X 15mm': [], 'Ø4.5 X 18mm': ['Lot-MP 0155', 'Lot-MP 0169'], 'Ø4.5 X 20mm': ['Lot-MP 0155', 'Lot-MP 0168', 'Lot-MP 0169'],
+          'Ø5.0 X 6mm': ['Lot-MP 0155'], 'Ø5.0 X 8mm': ['Lot-MP 0155'], 'Ø5.0 X 10mm': ['Lot-MP 0148'], 'Ø5.0 X 11,5mm': ['Lot-MP 0127', 'Lot-MP 0148', 'Lot-MP 0155'], 'Ø5.0 X 13mm': ['Lot-MP 0148'],
+          'Ø5.5 X 6mm': ['Lot-MP 0110', 'Lot-MP 0155'], 'Ø5.5 X 8mm': ['Lot-MP 0148'], 'Ø5.5 X 10mm': ['Lot-MP 0148'], 'Ø5.5 X 11,5mm': ['Lot-MP 0137', 'Lot-MP 0148'], 'Ø5.5 X 13mm': ['Lot-MP 0169']
+        }
+      },
+      HI: {
+        medidas: [
+          'Ø3.30 X 6,5mm', 'Ø3.30 X 8mm', 'Ø3.30 X 10mm', 'Ø3.30 X 11,5mm', 'Ø3.30 X 13mm', 'Ø3.30 X 16mm',
+          'Ø3,75 X 6,5mm', 'Ø3.75 X 8mm', 'Ø3.75 X 10mm', 'Ø3.75 X 11,5mm', 'Ø3.75 X 13mm', 'Ø3.75 X 16mm',
+          'Ø4,2 X 6,5mm', 'Ø4.2 X 8mm', 'Ø4.2 X 10mm', 'Ø4.2 X 11,5mm', 'Ø4.2 X 13mm', 'Ø4.2 X 16mm',
+          'Ø5,0 X 6,5mm', 'Ø5.0 X 8mm', 'Ø5.0 X 10mm', 'Ø5.0 X 11,5mm', 'Ø5.0 X 13mm', 'Ø5.0 X 16mm'
+        ],
+        lotes: {
+          'Ø3.30 X 6,5mm': ['Lot-HI 096', 'Lot-HI 0136'], 'Ø3.30 X 8mm': ['Lot-HI 0151'], 'Ø3.30 X 10mm': [], 'Ø3.30 X 11,5mm': [], 'Ø3.30 X 13mm': ['Lot-HI 0151'], 'Ø3.30 X 16mm': ['Lot-HI 0136'],
+          'Ø3,75 X 6,5mm': ['Lot-HI 096'], 'Ø3.75 X 8mm': [], 'Ø3.75 X 10mm': [], 'Ø3.75 X 11,5mm': [], 'Ø3.75 X 13mm': [], 'Ø3.75 X 16mm': [],
+          'Ø4,2 X 6,5mm': ['Lot-HI 0118'], 'Ø4.2 X 8mm': [], 'Ø4.2 X 10mm': [], 'Ø4.2 X 11,5mm': [], 'Ø4.2 X 13mm': [], 'Ø4.2 X 16mm': [],
+          'Ø5,0 X 6,5mm': ['Lot-HI 0131', 'Lot-HI 0163'], 'Ø5.0 X 8mm': ['Lot-HI 0163'], 'Ø5.0 X 10mm': [], 'Ø5.0 X 11,5mm': ['Lot-HI 0151'], 'Ø5.0 X 13mm': [], 'Ø5.0 X 16mm': ['Lot-HI 086']
+        }
+      },
+      HE: {
+        medidas: [
+          'Ø3.30 X 8,5mm', 'Ø3.30 X 10mm', 'Ø3.30 X 11,5mm', 'Ø3.30 X 13mm', 'Ø3.30 X 15mm',
+          'Ø3.75 X 8,5mm', 'Ø3.75 X 10mm', 'Ø3.75 X 11,5mm', 'Ø3.75 X 13mm', 'Ø3.75 X 15mm',
+          'Ø4.0 X 6mm', 'Ø4.0 X 8,5mm', 'Ø4.0 X 10mm', 'Ø4.0 X 11,5mm', 'Ø4.0 X 13mm', 'Ø4.0 X 15mm',
+          'Ø5.0 X 8,5mm', 'Ø5.0 X 10mm', 'Ø5.0 X 11,5mm', 'Ø5.0 X 13mm', 'Ø5.0 X 15mm'
+        ],
+        lotes: {
+          'Ø3.30 X 8,5mm': ['Lote HE-093', 'Lote HE-0100'], 'Ø3.30 X 10mm': [], 'Ø3.30 X 11,5mm': [], 'Ø3.30 X 13mm': ['Lote HE-085'], 'Ø3.30 X 15mm': [],
+          'Ø3.75 X 8,5mm': [], 'Ø3.75 X 10mm': [], 'Ø3.75 X 11,5mm': ['Lote HE - 0164'], 'Ø3.75 X 13mm': ['Lote HE-085'], 'Ø3.75 X 15mm': ['Lote HE-075'],
+          'Ø4.0 X 6mm': ['Lote HE-0109', 'Lote HE - 0164'], 'Ø4.0 X 8,5mm': [], 'Ø4.0 X 10mm': ['Lote HE - 0164'], 'Ø4.0 X 11,5mm': [], 'Ø4.0 X 13mm': ['Lote HE-0100', 'Lote HE-0109'], 'Ø4.0 X 15mm': [],
+          'Ø5.0 X 8,5mm': ['Lote HE-0100', 'Lote HE-0120'], 'Ø5.0 X 10mm': [], 'Ø5.0 X 11,5mm': [], 'Ø5.0 X 13mm': ['Lote HE-085'], 'Ø5.0 X 15mm': ['Lote HE-073']
+        }
+      },
+      MBP: {
+        medidas: [
+          'Ø3.5 X 10mm', 'Ø3.5 X 12mm', 'Ø3.5 X 15mm', 'Ø3.5 X 18mm', 'Ø3.5 X 21mm', 'Ø3.5 X 23mm', 'Ø3.5 X 24mm', 'Ø3.5 X 26mm', 'Ø3.5 X 28mm', 'Ø3.5 X 24mm C14', 'Ø3.5 X 26mm C16', 'Ø3.5 X 28mm C18',
+          'Ø4.5 X 10mm', 'Ø4.5 X 12mm', 'Ø4.5 X 15mm', 'Ø4.5 X 18mm', 'Ø4.5 X 21mm', 'Ø4.5 X 23mm', 'Ø4.5 X 24mm', 'Ø4.5 X 26mm', 'Ø4.5 X 28mm', 'Ø4.5 X 24mm C14', 'Ø4.5 X 26mm C16', 'Ø4.5 X 28mm C18',
+          'Ø5.5 X 9mm', 'Ø5.5 X 10mm', 'Ø5.5 X 12mm', 'Ø5.5 X 15mm', 'Ø5.5 X 18mm', 'Ø6.5 X 10mm', 'Ø6.5 X 12mm'
+        ],
+        lotes: {
+          'Ø3.5 X 10mm': [], 'Ø3.5 X 12mm': ['Lot-IB 0158'], 'Ø3.5 X 15mm': ['Lot-IB 0172'], 'Ø3.5 X 18mm': ['Lot-IB 0172'], 'Ø3.5 X 21mm': ['Lot-IB 0153'], 'Ø3.5 X 23mm': ['Lot-IB 0158'], 'Ø3.5 X 24mm': ['Lot-IB 0158'], 'Ø3.5 X 26mm': ['Lot-IB 0128', 'Lot-IB 0172'], 'Ø3.5 X 28mm': ['Lot-IB 0128', 'Lot-IB 0172'], 'Ø3.5 X 24mm C14': ['Lot-IB 0172'], 'Ø3.5 X 26mm C16': ['Lot-IB 0128', 'Lot-IB 0172'], 'Ø3.5 X 28mm C18': ['Lot-IB 0128', 'Lot-IB 0172'],
+          'Ø4.5 X 10mm': ['Lot-IB 0158'], 'Ø4.5 X 12mm': ['Lot-IB 0150', 'Lot-IB 0158'], 'Ø4.5 X 15mm': ['Lot-IB 0158'], 'Ø4.5 X 18mm': ['Lot-IB 0172'], 'Ø4.5 X 21mm': ['Lot-IB 0158'], 'Ø4.5 X 23mm': ['Lot-IB 0128', 'Lot-IB 0158'], 'Ø4.5 X 24mm': ['Lot-IB 0111', 'Lot-IB 0128'], 'Ø4.5 X 26mm': ['Lot-IB 0128', 'Lot-IB 0172'], 'Ø4.5 X 28mm': ['Lot-IB 0128', 'Lot-IB 0172'], 'Ø4.5 X 24mm C14': ['Lot-IB 0128'], 'Ø4.5 X 26mm C16': ['Lot-IB 0111', 'Lot-IB 0128'], 'Ø4.5 X 28mm C18': ['Lot-IB 0128'],
+          'Ø5.5 X 9mm': ['Lot-IB 0135', 'Lot-IB 0158'], 'Ø5.5 X 10mm': ['Lot-IB 0135', 'Lot-IB 0158'], 'Ø5.5 X 12mm': ['Lot-IB 0128', 'Lot-IB 0158'], 'Ø5.5 X 15mm': ['Lot-IB 0135', 'Lot-IB 0158'], 'Ø5.5 X 18mm': ['Lot-IB 0111'], 'Ø6.5 X 10mm': [], 'Ø6.5 X 12mm': []
+        }
+      },
+      MBT: {
+        medidas: [
+          'Ø3.5 X 10mm', 'Ø3.5 X 12mm', 'Ø3.5 X 15mm', 'Ø3.5 X 18mm', 'Ø3.5 X 21mm', 'Ø3.5 X 23mm', 'Ø3.5 X 24mm', 'Ø3.5 X 26mm', 'Ø3.5 X 28mm', 'Ø3.5 X 24mm C14', 'Ø3.5 X 26mm C16', 'Ø3.5 X 28mm C18',
+          'Ø4.5 X 10mm', 'Ø4.5 X 12mm', 'Ø4.5 X 15mm', 'Ø4.5 X 18mm', 'Ø4.5 X 21mm', 'Ø4.5 X 23mm', 'Ø4.5 X 24mm', 'Ø4.5 X 26mm', 'Ø4.5 X 28mm', 'Ø4.5 X 24mm C14', 'Ø4.5 X 26mm C16', 'Ø4.5 X 28mm C18',
+          'Ø5.5 X 9mm', 'Ø5.5 X 10mm', 'Ø5.5 X 12mm', 'Ø5.5 X 15mm', 'Ø5.5 X 18mm', 'Ø6.5 X 9mm', 'Ø6.5 X 10mm'
+        ],
+        lotes: {
+          'Ø3.5 X 10mm': [], 'Ø3.5 X 12mm': [], 'Ø3.5 X 15mm': [], 'Ø3.5 X 18mm': ['Lot-IBT 0171'], 'Ø3.5 X 21mm': ['Lot-IBT 0166', 'Lot-IBT 0171'], 'Ø3.5 X 23mm': ['Lot-IBT 0171'], 'Ø3.5 X 24mm': ['Lot-IBT 0126', 'Lot-IBT 0156'], 'Ø3.5 X 26mm': ['Lot-IBT 0116', 'Lot-IBT 0126'], 'Ø3.5 X 28mm': ['Lot-IBT 0116', 'Lot-IBT 0126'], 'Ø3.5 X 24mm C14': ['Lot-IBT 0171'], 'Ø3.5 X 26mm C16': ['Lot-IBT 0116'], 'Ø3.5 X 28mm C18': ['Lot-IBT 0116', 'Lot-IBT 0122'],
+          'Ø4.5 X 10mm': ['Lot-IBT 0171'], 'Ø4.5 X 12mm': ['Lot-IBT 0171'], 'Ø4.5 X 15mm': ['Lot-IBT 0171'], 'Ø4.5 X 18mm': ['Lot-IBT 0171'], 'Ø4.5 X 21mm': ['Lot-IBT 0157', 'Lot-IBT 0171'], 'Ø4.5 X 23mm': ['Lot-IBT 0112', 'Lot-IBT 0116'], 'Ø4.5 X 24mm': ['Lot-IBT 0112', 'Lot-IBT 0116'], 'Ø4.5 X 26mm': ['Lot-IBT 0116'], 'Ø4.5 X 28mm': ['Lot-IBT 0116'], 'Ø4.5 X 24mm C14': ['Lot-IBT 0116'], 'Ø4.5 X 26mm C16': ['Lot-IBT 0116'], 'Ø4.5 X 28mm C18': ['Lot-IBT 0116'],
+          'Ø5.5 X 9mm': ['Lot-IBT 0157'], 'Ø5.5 X 10mm': ['Lot-IBT 0157'], 'Ø5.5 X 12mm': ['Lot-IBT 0157'], 'Ø5.5 X 15mm': ['Lot-IBT 0157'], 'Ø5.5 X 18mm': ['Lot-IBT 0116'], 'Ø6.5 X 9mm': ['Lot-IBT 0171'], 'Ø6.5 X 10mm': ['Lot-IBT 0171']
+        }
+      },
+      CM: {
+        medidas: [
+          '3.30 X 8', '3.30 X 10', '3.30 X 11,5', '3.30 X 13', '3.30 X 16',
+          '3.75 X 8', '3.75 X 10', '3.75 X 11,5', '3.75 X 13', '3.75 X 16',
+          '4.2  X  8', '4.2  X  10', '4.2  X  11,5', '4.2  X  13', '4.2  X  16',
+          '5.0  X  8', '5.0  X  10', '5.0  X  11,5', '5.0  X  13', '5.0  X  16'
+        ],
+        lotes: {
+          '3.30 X 8': ['Lot-CMHI 0103'], '3.30 X 10': ['Lot-CMHI 0103'], '3.30 X 11,5': ['Lot-CMHI 0103'], '3.30 X 13': ['Lot-CMHI 0103'], '3.30 X 16': ['Lot-CMHI 0103'],
+          '3.75 X 8': ['Lot-CMHI 0103'], '3.75 X 10': [], '3.75 X 11,5': ['Lot-CMHI 0103'], '3.75 X 13': [], '3.75 X 16': ['Lot-CMHI 0103'],
+          '4.2  X  8': ['Lot-CMHI 0103'], '4.2  X  10': [], '4.2  X  11,5': ['Lot-CMHI 0103'], '4.2  X  13': ['Lot-CMHI 0103'], '4.2  X  16': ['Lot-CMHI 0103'],
+          '5.0  X  8': ['Lot-CMHI 0103'], '5.0  X  10': ['Lot-CMHI 0103'], '5.0  X  11,5': ['Lot-CMHI 0103'], '5.0  X  13': ['Lot-CMHI 0103'], '5.0  X  16': ['Lot-CMHI 0103']
+        }
+      },
+      CMU: {
+        medidas: [
+          'Ø3.0 X 6mm', 'Ø3.0 X 8mm', 'Ø3.0 X 10mm', 'Ø3.0 X 11,5mm', 'Ø3.0 X 13mm', 'Ø3.0 X 15mm', 'Ø3.0 X 18mm', 'Ø3.0 X 20mm',
+          'Ø3.5 X 6mm', 'Ø3.5 X 8mm', 'Ø3.5 X 10mm', 'Ø3.5 X 11,5mm', 'Ø3.5 X 13mm', 'Ø3.5 X 15mm', 'Ø3.5 X 18mm', 'Ø3.5 X 20mm',
+          'Ø4.0 X 6mm', 'Ø4.0 X 8mm', 'Ø4.0 X 10mm', 'Ø4.0 X 11,5mm', 'Ø4.0 X 13mm', 'Ø4.0 X 15mm', 'Ø4.0 X 18mm', 'Ø4.0 X 20mm',
+          'Ø4.5 X 6mm', 'Ø4.5 X 8mm', 'Ø4.5 X 10mm', 'Ø4.5 X 11,5mm', 'Ø4.5 X 13mm', 'Ø4.5 X 15mm', 'Ø4.5 X 18mm', 'Ø4.5 X 20mm',
+          'Ø5.0 X 6mm', 'Ø5.0 X 8mm', 'Ø5.0 X 10mm', 'Ø5.0 X 11,5mm', 'Ø5.0 X 13mm', 'Ø5.0 X 15mm', 'Ø5.0 X 18mm', 'Ø5.0 X 20mm',
+          'Ø5.5 X 6mm', 'Ø5.5 X 8mm', 'Ø5.5 X 10mm', 'Ø5.5 X 11,5mm', 'Ø5.5 X 13mm'
+        ],
+        lotes: {
+          'Ø3.0 X 6mm': ['Lot-CMU 0159'], 'Ø3.0 X 8mm': ['Lot-CMU 0159'], 'Ø3.0 X 10mm': ['Lot-CMU 0159'], 'Ø3.0 X 11,5mm': ['Lot-CMU 0123', 'Lot-CMU 0159'], 'Ø3.0 X 13mm': ['Lot-CMU 0159'], 'Ø3.0 X 15mm': ['Lot-CMU 0123', 'Lot-CMU 0159'], 'Ø3.0 X 18mm': ['Lot-CMU 0123', 'Lot-CMU 0159'], 'Ø3.0 X 20mm': ['Lot-CMU 0123', 'Lot-CMU 0159'],
+          'Ø3.5 X 6mm': ['Lot-CMU 0123', 'Lot-CMU 0159'], 'Ø3.5 X 8mm': ['Lot-CMU 0159'], 'Ø3.5 X 10mm': ['Lot-CMU 0159', 'Lot-CMU 0173'], 'Ø3.5 X 11,5mm': ['Lot-CMU 0142', 'Lot-CMU 0159'], 'Ø3.5 X 13mm': ['Lot-CMU 0142', 'Lot-CMU 0159'], 'Ø3.5 X 15mm': ['Lot-CMU 0142', 'Lot-CMU 0159'], 'Ø3.5 X 18mm': ['Lot-CMU 0123', 'Lot-CMU 0145', 'Lot-CMU 0159'], 'Ø3.5 X 20mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0159'],
+          'Ø4.0 X 6mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.0 X 8mm': ['Lot-CMU 0173'], 'Ø4.0 X 10mm': ['Lot-CMU 0142', 'Lot-CMU 0173'], 'Ø4.0 X 11,5mm': ['Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.0 X 13mm': ['Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.0 X 15mm': ['Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.0 X 18mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.0 X 20mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'],
+          'Ø4.5 X 6mm': ['Lot-CMU 0142', 'Lot-CMU 0173'], 'Ø4.5 X 8mm': ['Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.5 X 10mm': ['Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.5 X 11,5mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.5 X 13mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.5 X 15mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.5 X 18mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø4.5 X 20mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'],
+          'Ø5.0 X 6mm': ['Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø5.0 X 8mm': ['Lot-CMU 0142', 'Lot-CMU 0173'], 'Ø5.0 X 10mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø5.0 X 11,5mm': ['Lot-CMU 0119', 'Lot-CMU 0123'], 'Ø5.0 X 13mm': ['Lot-CMU 0119', 'Lot-CMU 0123', 'Lot-CMU 0173'], 'Ø5.0 X 15mm': ['Lot-CMU 0119', 'Lot-CMU 0123'], 'Ø5.0 X 18mm': ['Lot-CMU 0119', 'Lot-CMU 0123'], 'Ø5.0 X 20mm': ['Lot-CMU 0119', 'Lot-CMU 0123'],
+          'Ø5.5 X 6mm': ['Lot-CMU 0142'], 'Ø5.5 X 8mm': ['Lot-CMU 0145', 'Lot-CMU 0173'], 'Ø5.5 X 10mm': ['Lot-CMU 0145'], 'Ø5.5 X 11,5mm': ['Lot-CMU 0145'], 'Ø5.5 X 13mm': ['Lot-CMU 0145', 'Lot-CMU 0173']
+        }
+      },
+      CMU3: {
+        medidas: [
+          'Ø3.0 X 6mm C3', 'Ø3.0 X 8mm C3', 'Ø3.0 X 10mm C3', 'Ø3.0 X 11,5mm C3', 'Ø3.0 X 13mm C3', 'Ø3.0 X 15mm C3', 'Ø3.0 X 18mm C3', 'Ø3.0 X 20mm C3',
+          'Ø3.5 X 6mm C3', 'Ø3.5 X 8mm C3', 'Ø3.5 X 10mm C3', 'Ø3.5 X 11,5mm C3', 'Ø3.5 X 13mm C3', 'Ø3.5 X 15mm C3', 'Ø3.5 X 18mm C3', 'Ø3.5 X 20mm C3',
+          'Ø4.0 X 6mm C3', 'Ø4.0 X 8mm C3', 'Ø4.0 X 10mm C3', 'Ø4.0 X 11,5mm C3', 'Ø4.0 X 13mm C3', 'Ø4.0 X 15mm C3', 'Ø4.0 X 18mm C3', 'Ø4.0 X 20mm C3',
+          'Ø4.5 X 6mm C3', 'Ø4.5 X 8mm C3', 'Ø4.5 X 10mm C3', 'Ø4.5 X 11,5mm C3', 'Ø4.5 X 13mm C3', 'Ø4.5 X 15mm C3', 'Ø4.5 X 18mm C3', 'Ø4.5 X 20mm C3',
+          'Ø5.0 X 6mm C3', 'Ø5.0 X 8mm C3', 'Ø5.0 X 10mm C3', 'Ø5.0 X 11,5mm C3', 'Ø5.0 X 13mm C3', 'Ø5.0 X 15mm C3', 'Ø5.0 X 18mm C3', 'Ø5.0 X 20mm C3',
+          'Ø5.5 X 6mm C3', 'Ø5.5 X 8mm C3', 'Ø5.5 X 10mm C3', 'Ø5.5 X 11,5mm C3', 'Ø5.5 X 13mm C3'
+        ],
+        lotes: {
+          'Ø3.0 X 6mm C3': ['Lot-CMU 0142'], 'Ø3.0 X 8mm C3': ['Lot-CMU 0173'], 'Ø3.0 X 10mm C3': ['Lot-CMU 0173'], 'Ø3.0 X 11,5mm C3': ['Lot-CMU 0142'], 'Ø3.0 X 13mm C3': [], 'Ø3.0 X 15mm C3': ['Lot-CMU 0142'], 'Ø3.0 X 18mm C3': [], 'Ø3.0 X 20mm C3': ['Lot-CMU 0123'],
+          'Ø3.5 X 6mm C3': ['Lot-CMU 0123'], 'Ø3.5 X 8mm C3': [], 'Ø3.5 X 10mm C3': ['Lot-CMU 0142'], 'Ø3.5 X 11,5mm C3': ['Lot-CMU 0142'], 'Ø3.5 X 13mm C3': [], 'Ø3.5 X 15mm C3': ['Lot-CMU 0142'], 'Ø3.5 X 18mm C3': ['Lot-CMU 0145'], 'Ø3.5 X 20mm C3': ['Lot-CMU 0119', 'Lot-CMU 0123'],
+          'Ø4.0 X 6mm C3': ['Lot-CMU 0119', 'Lot-CMU 0123'], 'Ø4.0 X 8mm C3': ['Lot-CMU 0142'], 'Ø4.0 X 10mm C3': ['Lot-CMU 0142'], 'Ø4.0 X 11,5mm C3': ['Lot-CMU 0142'], 'Ø4.0 X 13mm C3': ['Lot-CMU 0142'], 'Ø4.0 X 15mm C3': ['Lot-CMU 0123', 'Lot-CMU 0142'], 'Ø4.0 X 18mm C3': ['Lot-CMU 0119', 'Lot-CMU 0123'], 'Ø4.0 X 20mm C3': ['Lot-CMU 0119', 'Lot-CMU 0123'],
+          'Ø4.5 X 6mm C3': ['Lot-CMU 0123'], 'Ø4.5 X 8mm C3': ['Lot-CMU 0142'], 'Ø4.5 X 10mm C3': ['Lot-CMU 0145'], 'Ø4.5 X 11,5mm C3': ['Lot-CMU 0119', 'Lot-CMU 0123'], 'Ø4.5 X 13mm C3': ['Lot-CMU 0123', 'Lot-CMU 0145'], 'Ø4.5 X 15mm C3': ['Lot-CMU 0119', 'Lot-CMU 0123'], 'Ø4.5 X 18mm C3': ['Lot-CMU 0119', 'Lot-CMU 0123'], 'Ø4.5 X 20mm C3': ['Lot-CMU 0119', 'Lot-CMU 0123'],
+          'Ø5.0 X 6mm C3': ['Lot-CMU 0145', 'Lot-CMU 0173'], 'Ø5.0 X 8mm C3': ['Lot-CMU 0145'], 'Ø5.0 X 10mm C3': ['Lot-CMU 0145'], 'Ø5.0 X 11,5mm C3': ['Lot-CMU 0145'], 'Ø5.0 X 13mm C3': [], 'Ø5.0 X 15mm C3': [], 'Ø5.0 X 18mm C3': [], 'Ø5.0 X 20mm C3': [],
+          'Ø5.5 X 6mm C3': ['Lot-CMU 0145'], 'Ø5.5 X 8mm C3': ['Lot-CMU 0145'], 'Ø5.5 X 10mm C3': ['Lot-CMU 0145'], 'Ø5.5 X 11,5mm C3': ['Lot-CMU 0145'], 'Ø5.5 X 13mm C3': ['Lot-CMU 0145']
+        }
+      }
+    };
+
+    let state = { mov: 'dep', tipo: '', medida: '', lote: '' };
+
+    function selMov(v) {
+      state.mov = v;
+      document.getElementById('rb-dep').classList.toggle('on', v === 'dep');
+      document.getElementById('rb-sal').classList.toggle('on', v === 'sal');
+      document.getElementById('pq-sal').classList.toggle('hidden', v !== 'sal');
+      updateHint();
+      updateSummary();
+    }
+
+    function onTipo() {
+      const t = document.getElementById('tipo-sel').value;
+      state.tipo = t; state.medida = ''; state.lote = '';
+      
+      const mSel = document.getElementById('med-sel');
+      mSel.innerHTML = '<option value="">— Seleccioná la medida —</option>';
+      
+      if (t && DATA[t]) {
+        DATA[t].medidas.forEach(m => {
+          const o = document.createElement('option');
+          o.value = m; o.textContent = m;
+          mSel.appendChild(o);
+        });
+        document.getElementById('pq3').classList.remove('hidden');
+      } else {
+        document.getElementById('pq3').classList.add('hidden');
+      }
+      
+      document.getElementById('pq4').classList.add('hidden');
+      document.getElementById('pq4b').classList.add('hidden');
+      document.getElementById('pq5').classList.add('hidden');
+      hideSummary();
+    }
+
+    function onMedida() {
+      const m = document.getElementById('med-sel').value;
+      state.medida = m; state.lote = '';
+      
+      const lSel = document.getElementById('lote-sel');
+      lSel.innerHTML = '<option value="">— Seleccioná el lote —</option>';
+      
+      if (!m) {
+        document.getElementById('pq4').classList.add('hidden');
+        document.getElementById('pq5').classList.add('hidden');
+        return;
+      }
+      
+      const lotesDisponibles = DATA[state.tipo].lotes[m] || [];
+      
+      lotesDisponibles.forEach(l => {
+        const o = document.createElement('option');
+        o.value = l; o.textContent = l;
+        lSel.appendChild(o);
+      });
+      
+      // Opción universal para crear nuevos lotes
+      const oN = document.createElement('option');
+      oN.value = 'nuevo'; oN.textContent = '+ Crear nuevo lote';
+      lSel.appendChild(oN);
+      
+      document.getElementById('pq4').classList.remove('hidden');
+      document.getElementById('hint-lote').textContent = lotesDisponibles.length > 0 
+        ? `${lotesDisponibles.length} lote(s) detectado(s) en catálogo.` 
+        : 'No hay lotes registrados para esta medida. Se creará uno nuevo.';
+        
+      document.getElementById('pq5').classList.add('hidden');
+      hideSummary();
+    }
+
+    function onLote() {
+      const v = document.getElementById('lote-sel').value;
+      state.lote = v;
+      
+      document.getElementById('pq4b').classList.toggle('hidden', v !== 'nuevo');
+      if (v) {
+        document.getElementById('pq5').classList.remove('hidden');
+        updateHint();
+      } else {
+        document.getElementById('pq5').classList.add('hidden');
+      }
+      updateSummary();
+    }
+
+    function updateHint() {
+      if (state.lote) {
+        document.getElementById('hint-cant').textContent = 'Cantidad a ' + 
+          (state.mov === 'dep' ? 'agregar a ' : 'retirar de ') + 
+          (state.lote === 'nuevo' ? 'nuevo lote' : state.lote);
+      }
+    }
+
+    function updateSummary() {
+      const el = document.getElementById('preview-summary');
+      const c = document.getElementById('summary-content');
+      if (!state.tipo || !state.medida || !state.lote) { el.classList.add('hidden'); return; }
+      
+      const movLabel = state.lote === 'nuevo' ? 'Depósito (Lote Nuevo)' : (state.mov === 'dep' ? 'Depósito' : 'Salida');
+      c.innerHTML = `<strong>Tipo Implante:</strong> ${state.tipo}<br>
+                     <strong>Medida:</strong> ${state.medida}<br>
+                     <strong>Lote:</strong> ${state.lote === 'nuevo' ? '<em>A definir en campo nuevo</em>' : state.lote}<br>
+                     <strong>Operación:</strong> ${movLabel}`;
+      el.classList.remove('hidden');
+    }
+
+    function hideSummary() { document.getElementById('preview-summary').classList.add('hidden'); }
+
+    function submitPreview() {
+      document.getElementById('confirm-msg').classList.remove('hidden');
+      setTimeout(() => document.getElementById('confirm-msg').classList.add('hidden'), 5000);
+    }
+
+    function resetForm() {
+      document.getElementById('tipo-sel').value = '';
+      document.getElementById('lote-nuevo-inp').value = '';
+      document.getElementById('cant-inp').value = '';
+      state = { mov: 'dep', tipo: '', medida: '', lote: '' };
+      ['pq3', 'pq4', 'pq4b', 'pq5', 'pq-sal', 'preview-summary', 'confirm-msg'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      selMov('dep');
+    }
+  </script>
+</body>
+</html>
